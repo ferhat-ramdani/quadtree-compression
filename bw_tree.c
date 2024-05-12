@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include "bw_tree.h"
 
-bw_node *create_node(char data, bw_node **children) {
+bw_node *create_bw_node(char data, bw_node **children) {
   bw_node *bw_tree = (bw_node *)malloc(sizeof(bw_node));
   bw_tree->data = data;
   bw_tree->children = children;
   return bw_tree;
 }
 
-bw_node *create_leaf(char data) {
+bw_node *create_bw_leaf(char data) {
   bw_node *bw_tree = (bw_node *)malloc(sizeof(bw_node));
   bw_tree->data = data;
   bw_tree->children = NULL;
@@ -27,35 +27,35 @@ void display_bw_tree(bw_node *t) {
   printf("%s", t->children ? "\n<-\n" : "");
 }
 
-float node_leaf_dist(bw_node *node, bw_node *leaf) {
+float bw_node_leaf_dist(bw_node *node, bw_node *leaf) {
   float d = 0.0;
   int i;
   for(i = 0; i < MAX_CHILDREN; i++) {
-    d += distance(node->children[i], leaf);
+    d += bw_distance(node->children[i], leaf);
   }
   return d/4;
 }
 
-float node_node_dist(bw_node *node1, bw_node *node2) {
+float bw_node_node_dist(bw_node *node1, bw_node *node2) {
   float d = 0.0;
   int i;
   for(i = 0; i < MAX_CHILDREN; i++) {
-    d += distance(node1->children[i], node2->children[i]);
+    d += bw_distance(node1->children[i], node2->children[i]);
   }
   return d/4;
 }
 
-float distance(bw_node *t1, bw_node *t2) {
+float bw_distance(bw_node *t1, bw_node *t2) {
   if(t1 == NULL || t2 == NULL)
     return 0.0;
   if(t1->children == NULL && t2->children == NULL)
     return t1->data == t2->data ? 0 : 1;
   else if (t1->children != NULL && t2->children == NULL)
-    return node_leaf_dist(t1, t2);
+    return bw_node_leaf_dist(t1, t2);
   else if (t1->children == NULL && t2->children != NULL)
-    return node_leaf_dist(t2, t1);
+    return bw_node_leaf_dist(t2, t1);
   else
-    return node_node_dist(t1, t2);
+    return bw_node_node_dist(t1, t2);
 }
 
 void free_bw_tree(bw_node *t) {
