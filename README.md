@@ -1,2 +1,2 @@
 # Image-Compression-with-Quadtrees
-Compresssion d’images avec des quadtrees
+This project aims to provide a means of compressing 512x512 images using Quadtrees.

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "color.h"
 
 color *create_color(int red, int green, int blue) {
@@ -14,7 +15,7 @@ void print_color(color c) {
   printf("rgb(%d, %d, %d)\n", c.red, c.green, c.blue);
 }
 
-int distance(color c1, color c2) {
+float c_c_distance(color c1, color c2) {
   return sqrt(abs(c1.red - c2.red) + abs(c1.green - c2.green) + abs(c1.blue - c2.blue));
 }
 
