@@ -11,7 +11,7 @@ typedef struct _color {
 void print_color(color c);
 
 /* measure distance between two colors */
-int distance(color c1, color c2);
+float c_c_distance(color c1, color c2);
 
 /* create a color from the rgb components */
 color *create_color(int red, int green, int blue);
