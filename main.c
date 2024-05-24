@@ -4,12 +4,11 @@
 #include "c_tree.h"
 #include "color.h"
 
-
 int main() {
-  color *green = create_color(0, 255, 0);
-  color *red = create_color(255, 0, 0);
-  color *blue = create_color(0, 0, 255);
-  color *yellow = create_color(255, 255, 0);
+  color *green = create_color(0, 255, 0, 0);
+  color *red = create_color(255, 0, 0, 0);
+  color *blue = create_color(0, 0, 255, 0);
+  color *yellow = create_color(255, 255, 0, 0);
 
   c_node *leaf1 = create_c_leaf(green);
   c_node *leaf2 = create_c_leaf(red);
