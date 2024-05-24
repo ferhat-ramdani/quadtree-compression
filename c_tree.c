@@ -20,18 +20,16 @@ void display_c_tree(c_node *t) {
   if (t == NULL) return;
   if(t->color) print_color(*(t->color));
   printf("%s", t->children ? "\n->\n" : "");
-  for (int i = 0; t->children &&  i < MAX_CHILDREN; i++) {
+  for (int i = 0; t->children &&  i < MAX_CHILDREN; i++)
     display_c_tree(t->children[i]);
-  }
   printf("%s", t->children ? "\n<-\n" : "");
 }
 
 float c_node_leaf_dist(c_node *node, c_node *leaf) {
   float d = 0.0;
   int i;
-  for(i = 0; i < MAX_CHILDREN; i++) {
+  for(i = 0; i < MAX_CHILDREN; i++)
     d += c_distance(node->children[i], leaf);
-  }
   return d/4;
 }
 
@@ -49,9 +47,9 @@ float c_distance(c_node *t1, c_node *t2) {
     return 0.0;
   if(t1->children == NULL && t2->children == NULL)
     return c_c_distance(*(t1->color), *(t2->color));
-  else if (t1->children != NULL && t2->children == NULL)
+  if (t1->children != NULL && t2->children == NULL)
     return c_node_leaf_dist(t1, t2);
-  else if (t1->children == NULL && t2->children != NULL)
+  if (t1->children == NULL && t2->children != NULL)
     return c_node_leaf_dist(t2, t1);
   else
     return c_node_node_dist(t1, t2);

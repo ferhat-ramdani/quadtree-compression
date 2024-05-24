@@ -1,10 +1,12 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+
 typedef struct _color {
-  int red;
-  int green;
-  int blue;
+  unsigned char red;
+  unsigned char green;
+  unsigned char blue;
+  unsigned char alpha;
 } color;
 
 /* print the color c */
@@ -14,7 +16,7 @@ void print_color(color c);
 float c_c_distance(color c1, color c2);
 
 /* create a color from the rgb components */
-color *create_color(int red, int green, int blue);
+color *create_color(unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha);
 
 /* free the memory allocated for the color c */
 void free_color(color *c);
