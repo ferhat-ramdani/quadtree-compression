@@ -35,7 +35,7 @@ c_node* load_node(FILE *file) {
     for (int i = 0; i < MAX_CHILDREN; i++) {
       children[i] = load_node(file);
     }
-    return create_c_node(NULL, children);
+    return create_c_node(children);
   }
 }
 
