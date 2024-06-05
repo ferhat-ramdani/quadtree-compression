@@ -58,9 +58,9 @@ float bw_distance(bw_node *t1, bw_node *t2) {
     return bw_node_node_dist(t1, t2);
 }
 
-void sub_tree_distances(bw_node *t1, bw_node *t2, float *distances) {
-  /* TODO ... */
-}
+// void sub_tree_distances(bw_node *t1, bw_node *t2, float *distances) {
+//   /* TODO ... */
+// }
 
 void free_bw_tree(bw_node *t) {
   if (t == NULL || !t->children) // if bw_tree is empty or leaf

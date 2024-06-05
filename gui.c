@@ -154,7 +154,7 @@ c_node *create_c_tree_from_image(MLV_Image *image, int x, int y, int length) {
   children[2] = create_c_tree_from_image(image, x + length/2, y + length/2, length/2);
   children[3] = create_c_tree_from_image(image, x, y + length/2, length/2);
 
-  return create_c_node(NULL, children);
+  return create_c_node(children);
 }
 
 void draw_c_tree_as_image_aux(c_node *c_tree, int x, int y, int length) {
