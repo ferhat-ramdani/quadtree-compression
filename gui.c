@@ -93,7 +93,7 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
     } else if (y >= BUTTON_Y_POS(4) && y <= BUTTON_Y_POS(4) + BUTTON_HEIGHT) {
     // Minimize Quadtree
     if (*tree != NULL) {
-      minimize_quadtree(*tree);
+      minimize_identical_leaves_in_node(*tree);
       MLV_draw_text(200, 10, "Quadtree minimized", MLV_COLOR_RED);
       MLV_update_window();
     }
@@ -142,20 +142,17 @@ color *average_color(MLV_Image *image, int x, int y, int width, int height) {
   return create_color(r / count, g / count, b / count, a / count);
 }
 
-c_node *create_c_tree_from_image(MLV_Image *image, int x, int y, int width, int height) {
-  if (width <= 1 && height <= 1) {
-    color *c = average_color(image, x, y, width, height);
+c_node *create_c_tree_from_image(MLV_Image *image, int x, int y, int length) {
+  if (length <= 1) {
+    color *c = average_color(image, x, y, length, length);
     return create_c_leaf(c);
   }
 
-  int half_width = width / 2;
-  int half_height = height / 2;
-
   c_node **children = (c_node **)malloc(MAX_CHILDREN * sizeof(c_node *));
-  children[0] = create_c_tree_from_image(image, x, y, half_width, half_height);
-  children[1] = create_c_tree_from_image(image, x + half_width, y, half_width, half_height);
-  children[2] = create_c_tree_from_image(image, x, y + half_height, half_width, half_height);
-  children[3] = create_c_tree_from_image(image, x + half_width, y + half_height, half_width, half_height);
+  children[0] = create_c_tree_from_image(image, x, y, length/2);
+  children[1] = create_c_tree_from_image(image, x + length/2, y, length/2);
+  children[2] = create_c_tree_from_image(image, x + length/2, y + length/2, length/2);
+  children[3] = create_c_tree_from_image(image, x, y + length/2, length/2);
 
   return create_c_node(NULL, children);
 }

@@ -17,7 +17,7 @@ void handle_buttons(MLV_Image **image, c_node **tree);
 color *average_color(MLV_Image *image, int x, int y, int width, int height);
 
 /* Create a quadtree (c_tree) from an image */
-c_node *create_c_tree_from_image(MLV_Image *image, int x, int y, int width, int height);
+c_node *create_c_tree_from_image(MLV_Image *image, int x, int y, int length);
 
 /* Approximate an image using a quadtree */
 c_node *approximate_image(MLV_Image *image);
