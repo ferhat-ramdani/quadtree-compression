@@ -25,21 +25,28 @@ c_node *create_c_leaf(color *color);
 /* Display the nodes of the c_tree t */
 void display_c_tree(c_node *t);
 
-/* Measures exact distance between two trees, suppose t1 and t2 not NULL */
+/* 
+* Measures exact distance between two trees, suppose t1 and t2 not NULL .
+* The exact distance is the distance measured using the formulas given in the paper.
+*/
 float c_exact_distance(c_node *t1, c_node *t2);
 
-/* Measures mean distance between two trees, suppose t1 and t2 not NULL */
+/*
+* Measures mean distance between two trees, suppose t1 and t2 not NULL.
+* The mean distance is the distance measured using the mean color of the nodes of the two trees,
+* this means that the distance between t1 and t2 is simply the distance between t1->color and t2->color.
+*/
 float c_mean_distance(c_node *t1, c_node *t2);
 
 /* Returns the mean color of the colors of the given children nodes */
 color *mean_color(c_node **children);
 
 /* Stores the distances between every sub tree of the two trees in array distances */
-void sub_c_tree_distances(c_node *t1, c_node *t2, float *distances);
+// float *sub_c_tree_distances(c_node *t1, c_node *t2,);
 
 
 /* Frees the leaf */
-void free_leaf(c_node *leaf);
+void free_c_leaf(c_node *leaf);
 
 /* 
  * Free the memory allocated for the tree t

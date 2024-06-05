@@ -58,8 +58,8 @@ float c_exact_distance(c_node *t1, c_node *t2) {
 float c_mean_distance(c_node *t1, c_node *t2) {
   if(t1 == NULL || t2 == NULL)
     return 0.0;
-  if (t1 && !t2) return t1->color->red + t1->color->green + t1->color->blue + t1->color->alpha;
-  if (t2 && !t1) return t2->color->red + t2->color->green + t2->color->blue + t2->color->alpha;
+  if (t1 && !t2) return c_distance(*(t1->color));
+  if (t2 && !t1) return c_distance(*(t2->color));
   return c_c_distance(*(t1->color), *(t2->color));
 }
 
@@ -76,28 +76,28 @@ color *mean_color(c_node **children) {
   return create_color(r/4, g/4, b/4, a/4);
 }
 
-void sub_c_tree_distances(c_node *t1, c_node *t2, float *distances) {
-  if(t1 == NULL || t2 == NULL)
-    return;
-  if(t1->children == NULL && t2->children == NULL) {
-    distances[0] = c_exact_distance(t1, t2);
-    return;
-  }
-  if(t1->children != NULL && t2->children == NULL) {
-    for(int i = 0; i < MAX_CHILDREN; i++)
-      sub_c_tree_distances(t1->children[i], t2, distances + i);
-    return;
-  }
-  if(t1->children == NULL && t2->children != NULL) {
-    for(int i = 0; i < MAX_CHILDREN; i++)
-      sub_c_tree_distances(t1, t2->children[i], distances + i);
-    return;
-  }
-  for(int i = 0; i < MAX_CHILDREN; i++)
-    sub_c_tree_distances(t1->children[i], t2->children[i], distances + i);
-}
+// float *sub_c_tree_distances(c_node *t1, c_node *t2) {
+//   if(t1 == NULL || t2 == NULL)
+//     return NULL;
+//   if(t1->children == NULL && t2->children == NULL) {
+//     distances[0] = c_exact_distance(t1, t2);
+//     return;
+//   }
+//   if(t1->children != NULL && t2->children == NULL) {
+//     for(int i = 0; i < MAX_CHILDREN; i++)
+//       sub_c_tree_distances(t1->children[i], t2, distances + i);
+//     return;
+//   }
+//   if(t1->children == NULL && t2->children != NULL) {
+//     for(int i = 0; i < MAX_CHILDREN; i++)
+//       sub_c_tree_distances(t1, t2->children[i], distances + i);
+//     return;
+//   }
+//   for(int i = 0; i < MAX_CHILDREN; i++)
+//     sub_c_tree_distances(t1->children[i], t2->children[i], distances + i);
+// }
 
-void free_leaf(c_node *leaf) {
+void free_c_leaf(c_node *leaf) {
   if (leaf == NULL)
     return;
   if(leaf->color)

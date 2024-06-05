@@ -23,6 +23,13 @@ float c_c_distance(color c1, color c2) {
     abs(c1.alpha - c2.alpha));
 }
 
+float c_distance(color c1) {
+  return sqrt(abs(c1.red) +
+    abs(c1.green) +
+    abs(c1.blue) + 
+    abs(c1.alpha));
+}
+
 void free_color(color *c) {
   free(c);
 }
