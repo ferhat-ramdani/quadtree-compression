@@ -19,13 +19,7 @@ color *average_color(MLV_Image *image, int x, int y, int width, int height);
 /* Create a quadtree (c_tree) from an image */
 c_node *create_c_tree_from_image(MLV_Image *image, int x, int y, int width, int height);
 
-/* Save a quadtree to a binary file */
-void save_quadtree_binary(c_node *tree, const char *filename);
-
-/* Minimize a quadtree */
-void minimize_quadtree(c_node *node);
-
-/* Load a quadtree from a binary file */
-c_node* load_quadtree_binary(const char *filename);
+/* Approximate an image using a quadtree */
+c_node *approximate_image(MLV_Image *image);
 
 #endif /* GUI_H */
