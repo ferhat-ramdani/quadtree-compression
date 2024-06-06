@@ -98,19 +98,20 @@ color *mean_color(c_node **children) {
 // }
 
 void free_c_leaf(c_node *leaf) {
-  if (leaf == NULL)
-    return;
-  if(leaf->color)
-    free(leaf->color);
+  if (leaf == NULL) return;
+  if(leaf->color) free(leaf->color);
   free(leaf);
 }
 
 void free_c_tree(c_node *t) {
-  if (t == NULL || !t->children) // if c_tree is empty or leaf
-    return;
-  for (int i = 0; i < MAX_CHILDREN; i++)
-    free_c_tree(t->children[i]);
-  free(t->color);
-  free(t->children);
-  free(t);
+  if (t == NULL) return;
+  if (t->children == NULL)
+    free_c_leaf(t);
+  else {
+    for (int i = 0; i < MAX_CHILDREN; i++)
+      free_c_tree(t->children[i]);
+    free(t->color);
+    free(t->children);
+    free(t);
+  }
 }
