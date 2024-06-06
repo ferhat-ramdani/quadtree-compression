@@ -39,17 +39,17 @@ c_node* load_node(FILE *file) {
   }
 }
 
-void save_quadtree_binary(c_node *tree, const char *filename) {
+void save_c_tree_binary(const char *filename, c_node *c_tree) {
   FILE *file = fopen(filename, "wb");
   if (!file) {
     perror("Error opening file");
     return;
   }
-  save_node(file, tree);
+  save_node(file, c_tree);
   fclose(file);
 }
 
-c_node* load_quadtree_binary(const char *filename) {
+c_node* load_c_tree_binary(const char *filename) {
   FILE *file = fopen(filename, "rb"); // to read the file in a binary method
   if (!file) {
     perror("Error opening file");

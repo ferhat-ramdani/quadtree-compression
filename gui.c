@@ -44,7 +44,7 @@ void draw_buttons() {
   DRAW_BUTTON(4, "Minimize Quadtree");
   DRAW_BUTTON(5, "Save Minimized BW");
   DRAW_BUTTON(6, "Save Minimized RGBA");
-  DRAW_BUTTON(7, "Open Image");
+  DRAW_BUTTON(7, "Load minimized image");
   DRAW_BUTTON(8, "Quit");
   MLV_update_window();
 }
@@ -54,83 +54,6 @@ void draw_text(char *text, MLV_Color color) {
   int width, height;
   MLV_get_size_of_text(text, &width, &height);
   MLV_draw_text(MARGIN_LEFT + BUTTON_WIDTH + (WIDTH - MARGIN_LEFT - BUTTON_WIDTH) / 2 - width/2, HEIGHT/20 - height/2, text, color);
-}
-
-void handle_buttons(MLV_Image **image, c_node **tree) {
-  int x, y;
-  char *filename = NULL;
-
-  while (1) {
-    MLV_wait_mouse(&x, &y);
-
-    if (x >= MARGIN_LEFT && x <= MARGIN_LEFT + BUTTON_WIDTH) {
-      if (y >= BUTTON_Y_POS(0) && y <= BUTTON_Y_POS(0) + BUTTON_HEIGHT) {
-        // Load Image
-        if (*image != NULL) {
-          MLV_free_image(*image);
-        }
-        DRAW_INPUT_BOX(0, "Enter image filename: ", &filename);
-        *image = MLV_load_image(filename);
-        if (*image != NULL) {
-          MLV_resize_image_with_proportions(*image, IMAGE_SIZE, IMAGE_SIZE);
-          MLV_draw_image(*image, X_ORIGIN, Y_ORIGIN);
-          MLV_update_window();
-        }
-      } else if (y >= BUTTON_Y_POS(1) && y <= BUTTON_Y_POS(1) + BUTTON_HEIGHT) {
-        // Quadtree Approximation
-        if (*image != NULL) {
-          *tree = approximate_image(*image);
-        }
-      } else if (y >= BUTTON_Y_POS(2) && y <= BUTTON_Y_POS(2) + BUTTON_HEIGHT) {
-        // Save Binary BW
-        if (*tree != NULL) {
-          DRAW_INPUT_BOX(2, "Enter filename to save (BW): ", &filename);
-          save_quadtree_binary(*tree, filename);
-          draw_text("Quadtree saved (BW)", MLV_COLOR_YELLOW);
-          MLV_update_window();
-        }
-      } else if (y >= BUTTON_Y_POS(3) && y <= BUTTON_Y_POS(3) + BUTTON_HEIGHT) {
-        // Save Binary RGBA
-        if (*tree != NULL) {
-          DRAW_INPUT_BOX(3, "Enter filename to save (RGBA): ", &filename);
-          save_quadtree_binary(*tree, filename);
-          draw_text("Quadtree saved (RGBA)", MLV_COLOR_YELLOW);
-          MLV_update_window();
-        }
-      } else if (y >= BUTTON_Y_POS(4) && y <= BUTTON_Y_POS(4) + BUTTON_HEIGHT) {
-        // Minimize Quadtree
-        if (*tree != NULL) {
-          minimize_identical_leaves_in_node(*tree);
-          draw_text("Quadtree minimized", MLV_COLOR_YELLOW);
-          MLV_update_window();
-        }
-      } else if (y >= BUTTON_Y_POS(5) && y <= BUTTON_Y_POS(5) + BUTTON_HEIGHT) {
-        // Save Minimized BW
-        if (*tree != NULL) {
-          DRAW_INPUT_BOX(5, "Enter filename to save (Minimized BW): ", &filename);
-          save_quadtree_binary(*tree, filename);
-          draw_text("Quadtree saved (Minimized BW)", MLV_COLOR_YELLOW);
-          MLV_update_window();
-        }
-      } else if (y >= BUTTON_Y_POS(6) && y <= BUTTON_Y_POS(6) + BUTTON_HEIGHT) {
-        // Save Minimized RGBA
-        if (*tree != NULL) {
-          DRAW_INPUT_BOX(6, "Enter filename to save (Minimized RGBA): ", &filename);
-          save_quadtree_binary(*tree, filename);
-          draw_text("Quadtree saved (Minimized RGBA)", MLV_COLOR_YELLOW);
-          MLV_update_window();
-        }
-      } else if (y >= BUTTON_Y_POS(7) && y <= BUTTON_Y_POS(7) + BUTTON_HEIGHT) {
-        // Open Image
-        DRAW_INPUT_BOX(7, "Enter filename to open: ", &filename);
-        *tree = load_quadtree_binary(filename);
-        if (*tree != NULL) {
-          draw_text("Quadtree loaded", MLV_COLOR_YELLOW);
-          MLV_update_window();
-        }
-      }
-    }
-  }
 }
 
 color *average_color(MLV_Image *image, int x, int y, int width, int height) {
@@ -250,6 +173,11 @@ void split_leaves_by_err(c_node *c_tree, MLV_Image *image, int x, int y, int len
   }
 }
 
+/*
+ * Approximates the image by one step, by splitting the nodes which errors 
+ * are below a certain reference error = (min_err + max_err) / 3
+ * where min_err and max_err are the minimum and maximum errors of the leaves
+ */
 float step_approximate(c_node *c_tree, MLV_Image *image, int delay) {
   float min_err = FLT_MAX;
   float max_err = FLT_MIN;
@@ -264,7 +192,7 @@ float step_approximate(c_node *c_tree, MLV_Image *image, int delay) {
 c_node *approximate_image(MLV_Image *image) {
   color *c = average_color(image, 0, 0, MLV_get_image_width(image), MLV_get_image_height(image));
   c_node *c_tree = create_c_leaf(c);
-  int delay = 100;
+  int delay = 10;
   float err = FLT_MAX;
   int step = 0;
   while(err > 0.00001) {
@@ -274,3 +202,82 @@ c_node *approximate_image(MLV_Image *image) {
   }
   return c_tree;
 }
+
+void handle_buttons(MLV_Image **image, c_node **tree) {
+  int x, y;
+  char *filename = NULL;
+
+  while (1) {
+    MLV_wait_mouse(&x, &y);
+
+    if (x >= MARGIN_LEFT && x <= MARGIN_LEFT + BUTTON_WIDTH) {
+      if (y >= BUTTON_Y_POS(0) && y <= BUTTON_Y_POS(0) + BUTTON_HEIGHT) {
+        // Load Image
+        if (*image != NULL) {
+          MLV_free_image(*image);
+        }
+        DRAW_INPUT_BOX(0, "Enter image filename: ", &filename);
+        *image = MLV_load_image(filename);
+        if (*image != NULL) {
+          MLV_resize_image_with_proportions(*image, IMAGE_SIZE, IMAGE_SIZE);
+          MLV_draw_image(*image, X_ORIGIN, Y_ORIGIN);
+          MLV_update_window();
+        }
+      } else if (y >= BUTTON_Y_POS(1) && y <= BUTTON_Y_POS(1) + BUTTON_HEIGHT) {
+        // Quadtree Approximation
+        if (*image != NULL) {
+          *tree = approximate_image(*image);
+        }
+      } else if (y >= BUTTON_Y_POS(2) && y <= BUTTON_Y_POS(2) + BUTTON_HEIGHT) {
+        // Save Binary BW
+        if (*tree != NULL) {
+          DRAW_INPUT_BOX(2, "Enter filename to save (BW): ", &filename);
+          save_c_tree_binary(filename, *tree);
+          draw_text("Quadtree saved (BW)", MLV_COLOR_YELLOW);
+          MLV_update_window();
+        }
+      } else if (y >= BUTTON_Y_POS(3) && y <= BUTTON_Y_POS(3) + BUTTON_HEIGHT) {
+        // Save Binary RGBA
+        if (*tree != NULL) {
+          DRAW_INPUT_BOX(3, "Enter filename to save (RGBA): ", &filename);
+          save_c_tree_binary(filename, *tree);
+          draw_text("Quadtree saved (RGBA)", MLV_COLOR_YELLOW);
+          MLV_update_window();
+        }
+      } else if (y >= BUTTON_Y_POS(4) && y <= BUTTON_Y_POS(4) + BUTTON_HEIGHT) {
+        // Minimize Quadtree
+        if (*tree != NULL) {
+          minimize_identical_leaves_in_node(*tree);
+          draw_text("Quadtree minimized", MLV_COLOR_YELLOW);
+          MLV_update_window();
+        }
+      } else if (y >= BUTTON_Y_POS(5) && y <= BUTTON_Y_POS(5) + BUTTON_HEIGHT) {
+        // Save Minimized BW
+        if (*tree != NULL) {
+          DRAW_INPUT_BOX(5, "Enter filename to save (Minimized BW): ", &filename);
+          save_c_tree_binary(filename, *tree);
+          draw_text("Quadtree saved (Minimized BW)", MLV_COLOR_YELLOW);
+          MLV_update_window();
+        }
+      } else if (y >= BUTTON_Y_POS(6) && y <= BUTTON_Y_POS(6) + BUTTON_HEIGHT) {
+        // Save Minimized RGBA
+        if (*tree != NULL) {
+          DRAW_INPUT_BOX(6, "Enter filename to save (Minimized RGBA): ", &filename);
+          save_c_tree_binary(filename, *tree);
+          draw_text("Quadtree saved (Minimized RGBA)", MLV_COLOR_YELLOW);
+          MLV_update_window();
+        }
+      } else if (y >= BUTTON_Y_POS(7) && y <= BUTTON_Y_POS(7) + BUTTON_HEIGHT) {
+        // Open Image
+        DRAW_INPUT_BOX(7, "Enter filename to open: ", &filename);
+        *tree = load_c_tree_binary(filename);
+        if (*tree != NULL) {
+          draw_text("Quadtree loaded", MLV_COLOR_YELLOW);
+          draw_c_tree_as_image(*tree, 'r');
+          MLV_update_window();
+        }
+      }
+    }
+  }
+}
+
