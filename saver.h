@@ -1,5 +1,5 @@
-#ifndef BINARY
-#define BINARY
+#ifndef SAVER_H
+#define SAVER_H
 
 #include "c_tree.h"
 #include "bw_tree.h"
@@ -16,4 +16,4 @@ c_node *load_c_tree_binary(const char *filename);
 /* Load a bw_tree from a binary file */
 bw_node *load_bw_tree_binary(const char *filename);
 
-#endif /* BINARY */
+#endif /* SAVER_H */

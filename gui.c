@@ -5,7 +5,7 @@
 #include "c_tree.h"
 #include "bw_tree.h"
 #include "color.h"
-#include "binary_converter.h"
+#include "saver.h"
 #include "minimizer.h"
 #include <string.h>
 
@@ -44,7 +44,7 @@ void draw_buttons() {
   DRAW_BUTTON(4, "Minimize Quadtree");
   DRAW_BUTTON(5, "Save Minimized BW");
   DRAW_BUTTON(6, "Save Minimized RGBA");
-  DRAW_BUTTON(7, "Load minimized image");
+  DRAW_BUTTON(7, "Load minimized Image");
   DRAW_BUTTON(8, "Quit");
   MLV_update_window();
 }
