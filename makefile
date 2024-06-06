@@ -21,4 +21,4 @@ debug: clean main
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f main $(OBJS)
+	rm -f main $(OBJS) *.qtn *.qtc

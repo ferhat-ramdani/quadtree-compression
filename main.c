@@ -4,57 +4,7 @@
 #include "c_tree.h"
 #include "color.h"
 #include "gui.h"
-
-// int main() {
-//   color *green = create_color(0, 255, 0, 0);
-//   color *red = create_color(255, 0, 0, 0);
-//   color *blue = create_color(0, 0, 255, 0);
-//   color *yellow = create_color(255, 255, 0, 0);
-
-//   c_node *leaf1 = create_c_leaf(green);
-//   c_node *leaf2 = create_c_leaf(red);
-//   c_node *leaf3 = create_c_leaf(blue);
-//   c_node *leaf4 = create_c_leaf(yellow);
-
-//   c_node **children1 = (c_node **)malloc(4 * sizeof(c_node *));
-//   children1[0] = leaf1;
-//   children1[1] = leaf2;
-//   children1[2] = leaf3;
-//   children1[3] = leaf4;
-
-//   c_node **children2 = (c_node **)malloc(4 * sizeof(c_node *));
-//   children2[0] = leaf2;
-//   children2[1] = leaf2;
-//   children2[2] = leaf1;
-//   children2[3] = leaf1;
-
-//   c_node *node1 = create_c_node(NULL, children1);
-//   c_node *node2 = create_c_node(NULL, children2);
-
-//   c_node **children3 = (c_node **)malloc(4 * sizeof(c_node *));
-//   children3[0] = node1;
-//   children3[1] = leaf3;
-//   children3[2] = leaf2;
-//   children3[3] = node2;
-
-//   c_node *root = create_c_node(NULL, children3);
-
-//   display_c_tree(root);
-
-//   free_c_tree(root);
-
-//   free(leaf1);
-//   free(leaf2);
-//   free(leaf3);
-//   free(leaf4);
-
-//   free(green);
-//   free(red);
-//   free(blue);
-//   free(yellow);
-
-//   return 0;
-// }
+#include "binary_converter.h"
 
 int main() {
     MLV_Image *image = NULL;
@@ -67,5 +17,44 @@ int main() {
     handle_buttons(&image, &tree);
 
     MLV_free_window();
+
+    free_c_tree(tree);
+    free(image);
+
+    // // create 4 colors
+    // color *c1 = create_color(23, 123, 3, 255);
+    // color *c2 = create_color(82, 192, 27, 255);
+    // color *c3 = create_color(32, 12, 233, 255);
+    // color *c4 = create_color(82, 23, 72, 255);
+
+    // // create 4 leaves
+    // c_node *leaf1 = create_c_leaf(c1);
+    // c_node *leaf2 = create_c_leaf(c2);
+    // c_node *leaf3 = create_c_leaf(c3);
+    // c_node *leaf4 = create_c_leaf(c4);
+
+    // // create an array of 4 children
+    // c_node **children = (c_node **)malloc(MAX_CHILDREN * sizeof(c_node *));
+    // children[0] = leaf1;
+    // children[1] = leaf2;
+    // children[2] = leaf3;
+    // children[3] = leaf4;
+
+    // // create a c_node with the previous children
+    // c_node *c_tree = create_c_node(children);
+
+    // // display the c_tree
+    // display_c_tree(c_tree);
+
+    // printf("\n\ndone\n\n");
+
+    // // save the c_tree in a binary file
+    // save_c_tree_binary("c.qtc", c_tree);
+
+    // // load the c_tree from the binary file
+    // c_node *loaded_tree = load_c_tree_binary("c.qtc");
+
+    // // display the loaded tree
+    // display_c_tree(loaded_tree);
     return 0;
 }
