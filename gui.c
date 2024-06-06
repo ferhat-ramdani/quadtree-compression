@@ -115,7 +115,8 @@ void draw_c_tree_as_image(c_node *c_tree, char shape) {
   MLV_update_window();
 }
 
-float c_tree_err(c_node *c_tree, MLV_Image *image, int x, int y, int length) {
+/* Computes the error of a leaf */
+float c_leaf_err(c_node *c_tree, MLV_Image *image, int x, int y, int length) {
   float err = 0.0;
   int i, j;
   for(i = 0; i < length; i++) {
@@ -133,7 +134,7 @@ float c_tree_err(c_node *c_tree, MLV_Image *image, int x, int y, int length) {
 void get_min_max_err(c_node *c_tree, MLV_Image *image, int x, int y, int length, float *min_err, float *max_err) {
   if(c_tree == NULL) return;
   if (c_tree->children == NULL) {
-    float err = c_tree_err(c_tree, image, x, y, length);
+    float err = c_leaf_err(c_tree, image, x, y, length);
     if (err < *min_err) {
       *min_err = err;
     }
@@ -151,7 +152,7 @@ void get_min_max_err(c_node *c_tree, MLV_Image *image, int x, int y, int length,
 void split_leaves_by_err(c_node *c_tree, MLV_Image *image, int x, int y, int length, float ref_err) {
   if(c_tree == NULL) return;
   if (c_tree->children == NULL) {
-    float err = c_tree_err(c_tree, image, x, y, length);
+    float err = c_leaf_err(c_tree, image, x, y, length);
     if(err >= ref_err) {
       // split the node
       c_node **children = (c_node **)malloc(MAX_CHILDREN * sizeof(c_node *));
@@ -184,7 +185,7 @@ float step_approximate(c_node *c_tree, MLV_Image *image, int delay) {
   get_min_max_err(c_tree, image, 0, 0, MLV_get_image_width(image), &min_err, &max_err);
   float ref_err = (min_err + max_err) / 3;
   split_leaves_by_err(c_tree, image, 0, 0, MLV_get_image_width(image), ref_err);
-  draw_c_tree_as_image(c_tree, 'r');
+  draw_c_tree_as_image(c_tree, 'j');
   MLV_wait_milliseconds(delay);
   return ref_err;
 }

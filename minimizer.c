@@ -28,3 +28,5 @@ void minimize_identical_leaves_in_node(c_node *node) {
     node->color = first_color;
   }
 }
+
+

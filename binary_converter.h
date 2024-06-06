@@ -2,12 +2,18 @@
 #define BINARY
 
 #include "c_tree.h"
+#include "bw_tree.h"
 
-/* Save a quadtree to a binary file */
-void save_c_tree_binary(const char *filename, c_node *tree);
+/* Save a c_tree to a binary file */
+void save_c_tree_binary(const char *filename, c_node *c_tree);
 
-/* Load a quadtree from a binary file */
-c_node* load_c_tree_binary(const char *filename);
+/* Save a bw_tree to a binary file */
+void save_bw_tree_binary(const char *filename, bw_node *bw_tree);
 
+/* Load a c_tree from a binary file */
+c_node *load_c_tree_binary(const char *filename);
+
+/* Load a bw_tree from a binary file */
+bw_node *load_bw_tree_binary(const char *filename);
 
 #endif /* BINARY */

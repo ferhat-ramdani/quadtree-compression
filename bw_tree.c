@@ -63,10 +63,11 @@ float bw_distance(bw_node *t1, bw_node *t2) {
 // }
 
 void free_bw_tree(bw_node *t) {
-  if (t == NULL || !t->children) // if bw_tree is empty or leaf
-    return;
-  for (int i = 0; i < MAX_CHILDREN; i++)
-    free_bw_tree(t->children[i]);
-  free(t->children);
+  if (t == NULL) return;
+  if(t->children != NULL) {
+    for (int i = 0; i < MAX_CHILDREN; i++)
+      free_bw_tree(t->children[i]);
+    free(t->children);
+  }
   free(t);
 }
