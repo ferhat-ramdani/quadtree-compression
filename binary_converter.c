@@ -44,7 +44,6 @@ c_node* load_c_node(FILE *file) {
     fread(&blue, sizeof(unsigned char), 1, file);
     fread(&alpha, sizeof(unsigned char), 1, file);
     color *c = create_color(red, green, blue, alpha);
-    print_color(*c);
     return create_c_leaf(c);
   } else {
     c_node **children = (c_node **)malloc(MAX_CHILDREN * sizeof(c_node *));
