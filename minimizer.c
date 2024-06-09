@@ -13,7 +13,11 @@ void minimize_identical_leaves_in_node(c_node *node) {
   bool identical_leaves_in_node = true;
   color *first_color = node->children[0]->color;
   for (int i = 1; i < MAX_CHILDREN; i++) {
-    if (node->children[i]->children != NULL || node->children[i]->color != first_color) {
+    if (node->children[i]->children != NULL ||  
+        node->children[i]->color->red != first_color->red || 
+        node->children[i]->color->green != first_color->green || 
+        node->children[i]->color->blue != first_color->blue || 
+        node->children[i]->color->alpha != first_color->alpha) {
       identical_leaves_in_node = false;
       break;
     }
