@@ -32,3 +32,71 @@ void minimize_identical_leaves_in_node(c_node *node) {
     node->color = first_color;
   }
 }
+
+unsigned int hash_color(const color *c) {
+    // To reduce hash collisions :
+    return (c->red * 31 + c->green * 37 + c->blue * 41 + c->alpha * 43) % HASH_TABLE_SIZE;
+}
+
+HashTable* create_hash_table() {
+    HashTable *hash_table = (HashTable *)malloc(sizeof(HashTable));
+    memset(hash_table->table, 0, sizeof(hash_table->table));
+    return hash_table;
+}
+
+void free_hash_table(HashTable *hash_table) {
+    for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+        HashNode *node = hash_table->table[i];
+        while (node) {
+            HashNode *tmp = node;
+            node = node->next;
+            free(tmp);
+        }
+    }
+    free(hash_table);
+}
+
+c_node* find_leaf(HashTable *hash_table, const color *c) {
+    unsigned int hash = hash_color(c);
+    HashNode *node = hash_table->table[hash];
+    while (node) {
+        if (memcmp(node->color, c, sizeof(color)) == 0) {
+            return node->leaf;
+        }
+        node = node->next;
+    }
+    return NULL;
+}
+
+void add_leaf(HashTable *hash_table, color *c, c_node *leaf) {
+    unsigned int hash = hash_color(c);
+    HashNode *new_node = (HashNode *)malloc(sizeof(HashNode));
+    new_node->color = c;
+    new_node->leaf = leaf;
+    new_node->next = hash_table->table[hash];
+    hash_table->table[hash] = new_node;
+}
+
+void minimize_unique_leaves_aux(c_node *node, HashTable *hash_table) {
+    if (node->children == NULL) {
+        c_node *existing_leaf = find_leaf(hash_table, node->color);
+        if (existing_leaf != NULL) {
+            free_c_leaf(node);
+            node->color = existing_leaf->color;
+            node->children = existing_leaf->children;
+        } else {
+            add_leaf(hash_table, node->color, node);
+        }
+        return;
+    }
+
+    for (int i = 0; i < MAX_CHILDREN; i++) {
+        minimize_unique_leaves_aux(node->children[i], hash_table);
+    }
+}
+
+void minimize_unique_leaves(c_node *node) {
+    HashTable *hash_table = create_hash_table();
+    minimize_unique_leaves_aux(node, hash_table);
+    free_hash_table(hash_table);
+}

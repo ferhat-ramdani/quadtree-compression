@@ -29,3 +29,19 @@ Je l'ai corrigé ainsi :
     break;
 }`
 ------------------------------------------------------------------------------------------
+minimisation (simple 2) :
+
+`hash_color` : Calcule une valeur de hachage unique pour une couleur donnée.
+
+`create_hash_table` : Crée et initialise une nouvelle table de hachage pour stocker les feuilles uniques par couleur.
+
+`free_hash_table` : Libère la mémoire allouée pour la table de hachage et tous ses nœuds.
+
+`find_leaf` : Recherche une feuille dans la table de hachage à partir de sa couleur. Retourne un pointeur vers la feuille si elle est trouvée, sinon retourne NULL.
+
+`add_leaf` : Ajoute une feuille à la table de hachage en utilisant sa couleur comme clé.
+
+`minimize_unique_leaves_aux` : Fonction récursive qui traverse l'arbre et minimise les feuilles. Si une feuille avec la même couleur existe déjà, elle remplace la feuille actuelle par cette feuille. Sinon, elle ajoute la feuille actuelle à la table de hachage.
+
+`minimize_unique_leaves` : Fonction principale qui initialise la table de hachage, appelle la fonction auxiliaire pour minimiser l'arbre, puis libère la mémoire de la table de hachage.
+------------------------------------------------------------------------------------------
