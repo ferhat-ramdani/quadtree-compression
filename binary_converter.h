@@ -1,11 +1,19 @@
 #ifndef BINARY
 #define BINARY
 
+#include <stdio.h>
+#include <stdlib.h>
 #include "c_tree.h"
 #include "bw_tree.h"
 
-/* Save a c_tree to a binary file */
-void save_c_tree_binary(const char *filename, c_node *c_tree);
+typedef struct {
+  unsigned char buffer;
+  int bit_count;
+  FILE *file;
+} BitBuffer;
+
+/* Save a quadtree to a binary file */
+void save_quadtree_binary(c_node *tree, const char *filename);
 
 /* Save a bw_tree to a binary file */
 void save_bw_tree_binary(const char *filename, bw_node *bw_tree);
