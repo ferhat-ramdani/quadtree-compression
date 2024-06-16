@@ -8,21 +8,21 @@
 #endif
 
 typedef struct _c_node {
-  color *color;              /* stored data of type char */
-  struct _c_node **children; /* pointers to the children */
+  color *color;              /* color of the node (mean color for internal nodes) */
+  struct _c_node **children; /* pointers to the children of node */
 } c_node;
 
 /*
-* Creates a node with the given data and children.
-* The function automatically updates the mean color of the node.
+* Creates a node with the given children.
+* The color of the returned node is the mean color of the colors of the children.
 * children must be allocated before calling this function.
 */
 c_node *create_c_node(c_node **children);
 
-/* Creates a leaf. */
+/* Creates a leaf with the given color. */
 c_node *create_c_leaf(color *color);
 
-/* Display the nodes of the c_tree t */
+/* Display the tree */
 void display_c_tree(c_node *t);
 
 /* 

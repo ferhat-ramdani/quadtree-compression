@@ -60,6 +60,7 @@ void save_node(BitBuffer *bit_buffer, c_node *node) {
     write_byte(bit_buffer, node->color->green);
     write_byte(bit_buffer, node->color->blue);
     write_byte(bit_buffer, node->color->alpha);
+
   } else {
     write_bit(bit_buffer, 0);
     for (int i = 0; i < MAX_CHILDREN; i++) {
@@ -87,7 +88,33 @@ c_node* load_node(BitBuffer *bit_buffer) {
   }
 }
 
-void save_quadtree_binary(c_node *tree, const char *filename) {
+bw_node* load_bw_node(FILE *file) {
+  char marker;
+  fread(&marker, sizeof(char), 1, file);
+  if (marker == 1) {
+    char data;
+    fread(&data, sizeof(char), 1, file);
+    return create_bw_leaf(data);
+  } else {
+    bw_node **children = (bw_node **)malloc(MAX_CHILDREN * sizeof(bw_node *));
+    for (int i = 0; i < MAX_CHILDREN; i++) {
+      children[i] = load_bw_node(file);
+    }
+    return create_bw_node(0, children);
+  }
+}
+
+void save_c_tree_binary(const char *filename, c_node *c_tree) {
+  FILE *file = fopen(filename, "wb");
+  if (!file) {
+    perror("Error opening file");
+    return;
+  }
+  save_c_node(file, c_tree);
+  fclose(file);
+}
+
+void save_bw_tree_binary(const char *filename, bw_node *bw_tree) {
   FILE *file = fopen(filename, "wb");
   if (!file) {
     perror("Error opening file");
@@ -101,7 +128,7 @@ void save_quadtree_binary(c_node *tree, const char *filename) {
   fclose(file);
 }
 
-c_node* load_quadtree_binary(const char *filename) {
+c_node *load_c_tree_binary(const char *filename) {
   FILE *file = fopen(filename, "rb"); // to read the file in a binary method
   if (!file) {
     perror("Error opening file");
@@ -111,6 +138,14 @@ c_node* load_quadtree_binary(const char *filename) {
   init_bit_buffer(&bit_buffer, file);
   c_node *tree = load_node(&bit_buffer);
   // c_node *tree = load_node(file);
+
+// bw_node *load_bw_tree_binary(const char *filename) {
+//  FILE *file = fopen(filename, "rb");
+//  if (!file) {
+//    perror("Error opening file");
+//    return NULL;
+//  }
+//  bw_node *tree = load_bw_node(file);
   fclose(file);
   return tree;
 }

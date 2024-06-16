@@ -32,11 +32,10 @@ void display_bw_tree(bw_node *t);
 float bw_distance(bw_node *t1, bw_node *t2);
 
 /* Stores the distances between every sub tree of the two trees in array distances */
-void sub_tree_distances(bw_node *t1, bw_node *t2, float *distances);
+// void sub_tree_distances(bw_node *t1, bw_node *t2, float *distances);
 
 /* 
- * Free the memory allocated for the tree t
- * Note: does not free memory for the leaves of the tree.
+ * Free the memory allocated for the tree t.
  */
 void free_bw_tree(bw_node *t);
 
