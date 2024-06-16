@@ -45,3 +45,4 @@ Je l'ai corrigé ainsi :
 `minimize_unique_leaves_aux` : Fonction récursive qui traverse l'arbre et minimise les feuilles. Si une feuille avec la même couleur existe déjà, elle remplace la feuille actuelle par cette feuille. Sinon, elle ajoute la feuille actuelle à la table de hachage.
 
 `minimize_unique_leaves` : Fonction principale qui initialise la table de hachage, appelle la fonction auxiliaire pour minimiser l'arbre, puis libère la mémoire de la table de hachage.
+
