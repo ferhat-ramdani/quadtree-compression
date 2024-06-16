@@ -1,6 +1,8 @@
 #ifndef BINARY_CONVERTER_H
 #define BINARY_CONVERTER_H
 
+#include <stdio.h>
+#include <stdlib.h>
 #include "c_tree.h"
 #include "bw_tree.h"
 

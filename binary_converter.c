@@ -67,6 +67,9 @@ void save_c_node(BitBuffer *bit_buffer, c_node *node) {
       save_c_node(bit_buffer, node->children[i]);
     }
   }
+  int bit = (bit_buffer->buffer >> (bit_buffer->bit_count - 1)) & 1;
+  bit_buffer->bit_count--;
+  return bit;
 }
 
 void save_bw_node(BitBuffer *bit_buffer, bw_node *node) {
