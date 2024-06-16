@@ -77,27 +77,6 @@ color *mean_color(c_node **children) {
   return create_color(r/4, g/4, b/4, a/4);
 }
 
-// float *sub_c_tree_distances(c_node *t1, c_node *t2) {
-//   if(t1 == NULL || t2 == NULL)
-//     return NULL;
-//   if(t1->children == NULL && t2->children == NULL) {
-//     distances[0] = c_exact_distance(t1, t2);
-//     return;
-//   }
-//   if(t1->children != NULL && t2->children == NULL) {
-//     for(int i = 0; i < MAX_CHILDREN; i++)
-//       sub_c_tree_distances(t1->children[i], t2, distances + i);
-//     return;
-//   }
-//   if(t1->children == NULL && t2->children != NULL) {
-//     for(int i = 0; i < MAX_CHILDREN; i++)
-//       sub_c_tree_distances(t1, t2->children[i], distances + i);
-//     return;
-//   }
-//   for(int i = 0; i < MAX_CHILDREN; i++)
-//     sub_c_tree_distances(t1->children[i], t2->children[i], distances + i);
-// }
-
 void free_c_leaf(c_node *leaf) {
   if (leaf == NULL) return;
   if(leaf->color) free(leaf->color);

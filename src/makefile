@@ -1,11 +1,11 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -pedantic -std=c99
+CFLAGS=-Wall -Wextra -pedantic -std=c99 -Iinclude
 DEBUG_CFLAGS=-g
 LDLIBS=-lm -lMLV
 
 SRCS=main.c bw_tree.c c_tree.c color.c gui.c binary_converter.c minimizer.c
 OBJS=$(SRCS:%.c=bin/%.o)
-DEPS=bw_tree.h c_tree.h color.h gui.h binary_converter.h minimizer.h
+DEPS=include/bw_tree.h include/c_tree.h include/color.h include/gui.h include/binary_converter.h include/minimizer.h
 
 .PHONY: all clean debug
 

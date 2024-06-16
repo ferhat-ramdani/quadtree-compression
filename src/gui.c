@@ -9,6 +9,10 @@
 #include "minimizer.h"
 #include <string.h>
 
+#include <dirent.h>
+#include <errno.h>
+#include <sys/stat.h>
+
 void initialize_window() {
   MLV_create_window("Quadtree Compression", "Quadtree Compression", WIDTH, HEIGHT);
 }
@@ -259,11 +263,20 @@ int ends_with(const char *str, const char *suffix) {
          strcmp(str + str_len - suffix_len, suffix) == 0;
 }
 
+void create_folder(char *filename){
+  DIR* dir = opendir(filename);
+  if (dir){
+    closedir(dir);
+  }else if(ENOENT == errno){
+    mkdir(filename, 0755);
+  }
+}
+
 void handle_buttons(MLV_Image **image, c_node **tree) {
   int x, y;
   char *filename = NULL;
   HashTable *hash_table = create_hash_table();
-
+  create_folder("compressed");
   while (1) {
     MLV_wait_mouse(&x, &y);
 
@@ -295,6 +308,7 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
             strcat(filename, ".qtn");
           }
           char filepath[256];
+          
           sprintf(filepath, "compressed/%s", filename);
           save_bw_tree_binary(filepath, bw_tree);
           draw_text("Quadtree saved (BW)", MLV_COLOR_YELLOW);
@@ -315,7 +329,7 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
         // Minimize Quadtree
         if (*tree != NULL) {
           minimize_identical_leaves_in_node(*tree);
-          *tree = minimize_unique_leaves_aux(*tree, hash_table);
+          *tree = minimize_unique_leaves(*tree, hash_table);
           draw_c_tree_as_image(*tree, '.');
           draw_text("Quadtree minimized", MLV_COLOR_YELLOW);
         }

@@ -76,7 +76,7 @@ void add_leaf(HashTable *hash_table, c_node *leaf) {
   hash_table->table[index] = hash_node;
 }
 
-c_node *minimize_unique_leaves_aux(c_node *node, HashTable *hash_table) {
+c_node *minimize_unique_leaves(c_node *node, HashTable *hash_table) {
   if (node->children == NULL) {
     c_node *existing_leaf = find_leaf(hash_table, node->color);
     if (existing_leaf != NULL) {
@@ -89,7 +89,7 @@ c_node *minimize_unique_leaves_aux(c_node *node, HashTable *hash_table) {
   }
 
   for (int i = 0; i < MAX_CHILDREN; i++) {
-    node->children[i] = minimize_unique_leaves_aux(node->children[i], hash_table);
+    node->children[i] = minimize_unique_leaves(node->children[i], hash_table);
   }
   return node;
 }

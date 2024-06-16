@@ -22,6 +22,6 @@ void free_hash_table(HashTable *hash_table);
 void minimize_identical_leaves_in_node(c_node *node);
 
 /* Minimize a quadtree by keeping only one leaf per color, stores the leaves in given hashtable */
-c_node *minimize_unique_leaves_aux(c_node *node, HashTable *hash_table);
+c_node *minimize_unique_leaves(c_node *node, HashTable *hash_table);
 
 #endif /* MINIMIZER_H */
