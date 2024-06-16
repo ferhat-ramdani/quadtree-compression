@@ -226,7 +226,7 @@ float step_approximate(c_node *c_tree, MLV_Image *image, int delay, char shape) 
 }
 
 c_node *approximate_image(MLV_Image *image, char shape) {
-  color *c = average_color(image, 0, 0, MLV_get_image_width(image), MLV_get_image_height(image));
+  color *c = average_color(image, 1, 1, MLV_get_image_width(image), MLV_get_image_height(image));
   c_node *c_tree = create_c_leaf(c);
   int delay = 10;
   float err = FLT_MAX;
@@ -306,7 +306,7 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
       } else if (y >= BUTTON_Y_POS(1) && y <= BUTTON_Y_POS(1) + BUTTON_HEIGHT) {
         // Quadtree Approximation
         if (*image != NULL) {
-          *tree = approximate_image(*image, '*');
+          *tree = approximate_image(*image, 'r');
         }
       } else if (y >= BUTTON_Y_POS(2) && y <= BUTTON_Y_POS(2) + BUTTON_HEIGHT) {
         // Save Binary BW
@@ -316,7 +316,9 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
           if(!ends_with(filename, ".qtn")) {
             strcat(filename, ".qtn");
           }
-          save_bw_tree_binary(filename, bw_tree);
+          char filepath[256];
+          sprintf(filepath, "src/%s", filename);
+          save_bw_tree_binary(filepath, bw_tree);
           draw_text("Quadtree saved (BW)", MLV_COLOR_YELLOW);
         }
       } else if (y >= BUTTON_Y_POS(3) && y <= BUTTON_Y_POS(3) + BUTTON_HEIGHT) {
@@ -326,7 +328,9 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
           if(!ends_with(filename, ".qtc")) {
             strcat(filename, ".qtc");
           }
-          save_c_tree_binary(filename, *tree);
+          char filepath[256];
+          sprintf(filepath, "src/%s", filename);
+          save_c_tree_binary(filepath, *tree);
           draw_text("Quadtree saved (RGBA)", MLV_COLOR_YELLOW);
         }
       } else if (y >= BUTTON_Y_POS(4) && y <= BUTTON_Y_POS(4) + BUTTON_HEIGHT) {
@@ -362,7 +366,7 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
         if(ends_with(filename, ".qtc")) {
           *tree = load_c_tree_binary(filename);
           if (*tree != NULL) {
-            draw_c_tree_as_image(*tree, '*');
+            draw_c_tree_as_image(*tree, '.');
             draw_text("Minimizd colored quadtree loaded", MLV_COLOR_YELLOW);
           } else {
             draw_text("Internal error", MLV_COLOR_RED);
