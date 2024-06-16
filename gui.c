@@ -5,32 +5,9 @@
 #include "c_tree.h"
 #include "bw_tree.h"
 #include "color.h"
-#include "saver.h"
+#include "binary_converter.h"
 #include "minimizer.h"
 #include <string.h>
-
-#define IMAGE_SIZE 512
-#define NB_BUTTONS 9
-#define WIDTH IMAGE_SIZE * 2
-#define HEIGHT IMAGE_SIZE * 3/2
-#define BUTTON_WIDTH WIDTH / 4
-#define BUTTON_HEIGHT HEIGHT / 15
-#define MARGIN_LEFT WIDTH / 20
-#define BUTTON_MARGIN HEIGHT / 30
-#define MARGIN_TOP (HEIGHT - (BUTTON_HEIGHT * NB_BUTTONS + (NB_BUTTONS - 1) * BUTTON_MARGIN)) / 2
-#define X_ORIGIN MARGIN_LEFT + BUTTON_WIDTH + (WIDTH - MARGIN_LEFT - BUTTON_WIDTH) / 2 - 256
-#define Y_ORIGIN HEIGHT/2 - IMAGE_SIZE/2
-#define INPUT_BOX_WIDTH WIDTH / 4
-#define INPUT_BOX_HEIGHT BUTTON_HEIGHT
-#define INPUT_BOX_X MARGIN_LEFT + BUTTON_WIDTH + 10
-#define INPUT_BOX_Y(y) (BUTTON_Y_POS(y))
-#define DRAW_INPUT_BOX(y, prompt, filename) \
-  MLV_wait_input_box(INPUT_BOX_X, INPUT_BOX_Y(y), INPUT_BOX_X + INPUT_BOX_WIDTH, INPUT_BOX_HEIGHT, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_COLOR_GRAY, prompt, filename);
-#define BUTTON_Y_POS(y) (MARGIN_TOP + BUTTON_HEIGHT * (y) + BUTTON_MARGIN * (y))
-#define DRAW_BUTTON(y, text) \
-  MLV_draw_text_box(MARGIN_LEFT, BUTTON_Y_POS(y), BUTTON_WIDTH, BUTTON_HEIGHT, text, 1, MLV_COLOR_WHITE, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER)
-#define CLEAR_NOTIFICATION() MLV_draw_filled_rectangle(MARGIN_LEFT + BUTTON_WIDTH, 0, WIDTH, HEIGHT/10, MLV_COLOR_BLACK)
-
 
 void initialize_window() {
   MLV_create_window("Quadtree Compression", "Quadtree Compression", WIDTH, HEIGHT);
@@ -285,6 +262,7 @@ int ends_with(const char *str, const char *suffix) {
 void handle_buttons(MLV_Image **image, c_node **tree) {
   int x, y;
   char *filename = NULL;
+  HashTable *hash_table = create_hash_table();
 
   while (1) {
     MLV_wait_mouse(&x, &y);
@@ -317,7 +295,7 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
             strcat(filename, ".qtn");
           }
           char filepath[256];
-          sprintf(filepath, "src/%s", filename);
+          sprintf(filepath, "compressed/%s", filename);
           save_bw_tree_binary(filepath, bw_tree);
           draw_text("Quadtree saved (BW)", MLV_COLOR_YELLOW);
         }
@@ -329,7 +307,7 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
             strcat(filename, ".qtc");
           }
           char filepath[256];
-          sprintf(filepath, "src/%s", filename);
+          sprintf(filepath, "compressed/%s", filename);
           save_c_tree_binary(filepath, *tree);
           draw_text("Quadtree saved (RGBA)", MLV_COLOR_YELLOW);
         }
@@ -337,6 +315,8 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
         // Minimize Quadtree
         if (*tree != NULL) {
           minimize_identical_leaves_in_node(*tree);
+          *tree = minimize_unique_leaves_aux(*tree, hash_table);
+          draw_c_tree_as_image(*tree, '.');
           draw_text("Quadtree minimized", MLV_COLOR_YELLOW);
         }
       } else if (y >= BUTTON_Y_POS(5) && y <= BUTTON_Y_POS(5) + BUTTON_HEIGHT) {
@@ -390,4 +370,5 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
       MLV_update_window();
     }
   }
+  free_hash_table(hash_table);
 }

@@ -1,8 +1,16 @@
-#ifndef SAVER_H
-#define SAVER_H
+#ifndef BINARY_CONVERTER_H
+#define BINARY_CONVERTER_H
 
 #include "c_tree.h"
 #include "bw_tree.h"
+
+#define BUFFER_SIZE 8
+
+typedef struct {
+  unsigned char buffer;
+  int bit_count;
+  FILE *file;
+} BitBuffer;
 
 /* Save a c_tree to a binary file */
 void save_c_tree_binary(const char *filename, c_node *c_tree);
@@ -16,4 +24,4 @@ c_node *load_c_tree_binary(const char *filename);
 /* Load a bw_tree from a binary file */
 bw_node *load_bw_tree_binary(const char *filename);
 
-#endif /* SAVER_H */
+#endif /* BINARY_CONVERTER_H */

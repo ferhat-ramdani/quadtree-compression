@@ -21,6 +21,9 @@ float c_distance(color c1);
 /* create a color from the rgb components */
 color *create_color(unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha);
 
+/* Tests if two colors are equal */
+int c_equals(const color *c1, const color *c2);
+
 /* free the memory allocated for the color c */
 void free_color(color *c);
 
