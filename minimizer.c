@@ -60,7 +60,7 @@ c_node* find_leaf(HashTable *hash_table, const color *c) {
     unsigned int hash = hash_color(c);
     HashNode *node = hash_table->table[hash];
     while (node) {
-        if (memcmp(node->color, c, sizeof(color)) == 0) {
+        if (memcmp(node->leaf->color, c, sizeof(color)) == 0) {
             return node->leaf;
         }
         node = node->next;
@@ -71,32 +71,31 @@ c_node* find_leaf(HashTable *hash_table, const color *c) {
 void add_leaf(HashTable *hash_table, color *c, c_node *leaf) {
     unsigned int hash = hash_color(c);
     HashNode *new_node = (HashNode *)malloc(sizeof(HashNode));
-    new_node->color = c;
     new_node->leaf = leaf;
     new_node->next = hash_table->table[hash];
     hash_table->table[hash] = new_node;
 }
 
-void minimize_unique_leaves_aux(c_node *node, HashTable *hash_table) {
+c_node* minimize_unique_leaves_aux(c_node *node, HashTable *hash_table) {
     if (node->children == NULL) {
         c_node *existing_leaf = find_leaf(hash_table, node->color);
         if (existing_leaf != NULL) {
             free_c_leaf(node);
-            node->color = existing_leaf->color;
-            node->children = existing_leaf->children;
+            return existing_leaf;
         } else {
-            add_leaf(hash_table, node->color, node);
+            return node;
         }
-        return;
     }
 
     for (int i = 0; i < MAX_CHILDREN; i++) {
-        minimize_unique_leaves_aux(node->children[i], hash_table);
+        node->children[i] = minimize_unique_leaves_aux(node->children[i], hash_table);
     }
+    return node;
 }
 
-void minimize_unique_leaves(c_node *node) {
+c_node* minimize_unique_leaves(c_node *node) {
     HashTable *hash_table = create_hash_table();
-    minimize_unique_leaves_aux(node, hash_table);
+    c_node *new_root = minimize_unique_leaves_aux(node, hash_table);
     free_hash_table(hash_table);
+    return new_root;
 }
