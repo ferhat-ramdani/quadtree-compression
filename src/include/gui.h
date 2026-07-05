@@ -2,15 +2,16 @@
 #define GUI_H
 
 #include <MLV/MLV_all.h>
+#include <stdbool.h>
 #include "c_tree.h"
 
 /* Macros */
 #define IMAGE_SIZE 512
-#define NB_BUTTONS 9
+#define NB_BUTTONS 7
 #define WIDTH IMAGE_SIZE * 2
 #define HEIGHT IMAGE_SIZE * 1.3
 #define BUTTON_WIDTH WIDTH / 4
-#define BUTTON_HEIGHT HEIGHT / 15
+#define BUTTON_HEIGHT HEIGHT / 12
 #define MARGIN_LEFT WIDTH / 20
 #define BUTTON_MARGIN HEIGHT / 30
 #define MARGIN_TOP (HEIGHT - (BUTTON_HEIGHT * NB_BUTTONS + (NB_BUTTONS - 1) * BUTTON_MARGIN)) / 2
@@ -25,6 +26,8 @@
 #define BUTTON_Y_POS(y) (MARGIN_TOP + BUTTON_HEIGHT * (y) + BUTTON_MARGIN * (y))
 #define DRAW_BUTTON(y, text) \
   MLV_draw_text_box(MARGIN_LEFT, BUTTON_Y_POS(y), BUTTON_WIDTH, BUTTON_HEIGHT, text, 1, MLV_COLOR_WHITE, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER)
+#define DRAW_BUTTON_RED(y, text) \
+  MLV_draw_text_box(MARGIN_LEFT, BUTTON_Y_POS(y), BUTTON_WIDTH, BUTTON_HEIGHT, text, 1, MLV_COLOR_RED, MLV_COLOR_WHITE, MLV_COLOR_RED, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER)
 #define CLEAR_NOTIFICATION() MLV_draw_filled_rectangle(MARGIN_LEFT + BUTTON_WIDTH, 0, WIDTH, HEIGHT/10, MLV_COLOR_BLACK)
 
 
@@ -32,7 +35,7 @@
 void initialize_window();
 
 /* Draw buttons for different functionalities */
-void draw_buttons();
+void draw_buttons(bool is_filled, char shape);
 
 /* Handle button clicks and perform corresponding actions */
 void handle_buttons(MLV_Image **image, c_node **tree);
@@ -44,6 +47,6 @@ color *average_color(MLV_Image *image, int x, int y, int width, int height);
 c_node *create_c_tree_from_image(MLV_Image *image, int x, int y, int length);
 
 /* Approximate an image using a quadtree */
-c_node *approximate_image(MLV_Image *image, char shape);
+c_node *approximate_image(MLV_Image *image, char shape, bool is_filled);
 
 #endif /* GUI_H */

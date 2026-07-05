@@ -1,6 +1,7 @@
 #include <MLV/MLV_all.h>
 #include <stdbool.h>
 #include <float.h>
+#include <math.h>
 #include "gui.h"
 #include "c_tree.h"
 #include "bw_tree.h"
@@ -18,16 +19,48 @@ void initialize_window() {
   MLV_create_window("Quadtree Compression", "Quadtree Compression", WIDTH, HEIGHT);
 }
 
-void draw_buttons() {
+void draw_shape(char shape, bool is_filled, MLV_Color color, int x, int y, int length);
+
+void draw_buttons(bool is_filled, char shape) {
   DRAW_BUTTON(0, "Load Image");
-  DRAW_BUTTON(1, "Quadtree Approximation");
-  DRAW_BUTTON(2, "Save Binary BW");
-  DRAW_BUTTON(3, "Save Binary RGBA");
-  DRAW_BUTTON(4, "Minimize Quadtree");
-  DRAW_BUTTON(5, "Save Minimized BW");
-  DRAW_BUTTON(6, "Save Minimized RGBA");
-  DRAW_BUTTON(7, "Load minimized Image");
-  DRAW_BUTTON(8, "Quit");
+  DRAW_BUTTON(1, "Approximate Quadtree");
+  DRAW_BUTTON(2, "Minimize Quadtree");
+  DRAW_BUTTON(3, "Save Image");
+
+  char mode_text[50];
+  sprintf(mode_text, "Toggle Mode: %s", is_filled ? "Filled" : "Outline");
+  DRAW_BUTTON(4, mode_text);
+
+  char shape_text[50];
+  char* shape_name;
+  switch(shape) {
+      case 't': shape_name = "Triangle"; break;
+      case 'c': shape_name = "Circle"; break;
+      case 'r': shape_name = "Cube"; break;
+      case 's': shape_name = "Star"; break;
+      case '*': shape_name = "Mix"; break;
+      case 'x': shape_name = "X Shape"; break;
+      default: shape_name = "Unknown";
+  }
+  sprintf(shape_text, "Toggle Shape: %s", shape_name);
+  DRAW_BUTTON(5, shape_text);
+  
+  // Draw the shape at the right edge of button 5
+  int draw_length = BUTTON_HEIGHT - 20;
+  int draw_x = MARGIN_LEFT + BUTTON_WIDTH - draw_length - 15;
+  int draw_y = BUTTON_Y_POS(5) + 10;
+  if (shape == '*') {
+     int sub_len = draw_length / 2;
+     draw_shape('t', is_filled, MLV_COLOR_WHITE, draw_x, draw_y, sub_len);
+     draw_shape('c', is_filled, MLV_COLOR_WHITE, draw_x + sub_len, draw_y, sub_len);
+     draw_shape('r', is_filled, MLV_COLOR_WHITE, draw_x, draw_y + sub_len, sub_len);
+     draw_shape('s', is_filled, MLV_COLOR_WHITE, draw_x + sub_len, draw_y + sub_len, sub_len);
+  } else {
+     draw_shape(shape, is_filled, MLV_COLOR_WHITE, draw_x, draw_y, draw_length);
+  }
+
+  DRAW_BUTTON_RED(6, "Quit Application");
+  
   MLV_update_window();
 }
 
@@ -69,66 +102,99 @@ c_node *create_c_tree_from_image(MLV_Image *image, int x, int y, int length) {
   return create_c_node(children);
 }
 
-void draw_shape(char shape, MLV_Color color, int x, int y, int length) {
-  if(shape == '*') {
-    int random = rand() % 4;
-    switch(random) {
-      case 0:
-        shape = 'r';
+void draw_shape(char shape, bool is_filled, MLV_Color color, int x, int y, int length) {
+  if (shape == '*') {
+     char shapes_filled[] = {'t', 'c', 'r', 's'};
+     char shapes_outline[] = {'t', 'c', 'r', 's', 'x'};
+     if (is_filled) {
+         shape = shapes_filled[rand() % 4];
+     } else {
+         shape = shapes_outline[rand() % 5];
+     }
+  }
+
+  if (is_filled) {
+    switch (shape) {
+      case 't': {
+        int vx[3] = {x + length/2, x, x + length};
+        int vy[3] = {y, y + length, y + length};
+        MLV_draw_filled_polygon(vx, vy, 3, color);
         break;
-      case 1:
-        shape = 'c';
+      }
+      case 'c':
+        MLV_draw_filled_circle(x + length/2, y + length/2, length/2, color);
         break;
-      case 2:
-        shape = 'x';
+      case 's': {
+        int vx[10], vy[10];
+        int cx = x + length/2, cy = y + length/2;
+        float R = length/2.0;
+        float r = length/4.0;
+        for (int i = 0; i < 10; i++) {
+            float angle = i * 3.14159265 / 5.0 - 3.14159265 / 2.0;
+            float rad = (i % 2 == 0) ? R : r;
+            vx[i] = cx + (int)(rad * cos(angle));
+            vy[i] = cy + (int)(rad * sin(angle));
+        }
+        MLV_draw_filled_polygon(vx, vy, 10, color);
         break;
-      case 3:
-        shape = '+';
+      }
+      case 'r':
+      default:
+        MLV_draw_filled_rectangle(x, y, length, length, color);
+        break;
+    }
+  } else {
+    switch(shape) {
+      case 't': {
+        int vx[3] = {x + length/2, x, x + length};
+        int vy[3] = {y, y + length, y + length};
+        MLV_draw_polygon(vx, vy, 3, color);
+        break;
+      }
+      case 'c':
+        MLV_draw_circle(x + length/2, y + length/2, length/2, color);
+        break;
+      case 's': {
+        int vx[10], vy[10];
+        int cx = x + length/2, cy = y + length/2;
+        float R = length/2.0;
+        float r = length/4.0;
+        for (int i = 0; i < 10; i++) {
+            float angle = i * 3.14159265 / 5.0 - 3.14159265 / 2.0;
+            float rad = (i % 2 == 0) ? R : r;
+            vx[i] = cx + (int)(rad * cos(angle));
+            vy[i] = cy + (int)(rad * sin(angle));
+        }
+        MLV_draw_polygon(vx, vy, 10, color);
+        break;
+      }
+      case 'x':
+        MLV_draw_line(x, y, x + length, y + length, color);
+        MLV_draw_line(x, y + length, x + length, y, color);
+        break;
+      case 'r':
+      default:
+        MLV_draw_rectangle(x, y, length, length, color);
         break;
     }
   }
-  switch(shape) {
-    case 'r':
-      MLV_draw_rectangle(x, y, length, length, color);
-      break;
-    case 'c':
-      MLV_draw_circle(x + length/2, y + length/2, length/2, color);
-      break;
-    case '-':
-      MLV_draw_line(x, y + length/2, x + length, y + length/2, color);
-      break;
-    case '|':
-      MLV_draw_line(x + length/2, y, x + length/2, y + length, color);
-      break;
-    case 'x':
-      MLV_draw_line(x, y, x + length, y + length, color);
-      MLV_draw_line(x, y + length, x + length, y, color);
-      break;
-    case '+':
-      MLV_draw_line(x + length/2, y, x + length/2, y + length, color);
-      MLV_draw_line(x, y + length/2, x + length, y + length/2, color);
-      break;
-    default:
-      MLV_draw_filled_rectangle(x, y, length, length, color);
-      break;
-  }
 } 
 
-void draw_c_tree_as_image_aux(c_node *c_tree, int x, int y, int length, char shape) {
+void draw_c_tree_as_image_aux(c_node *c_tree, int x, int y, int length, char shape, bool is_filled) {
   if (c_tree->children == NULL) {
     MLV_Color color = MLV_rgba(c_tree->color->red, c_tree->color->green, c_tree->color->blue, c_tree->color->alpha);
-    draw_shape(shape, color, x, y, length);
+    draw_shape(shape, is_filled, color, x, y, length);
   } else {
-    draw_c_tree_as_image_aux(c_tree->children[0], x, y, length/2, shape);
-    draw_c_tree_as_image_aux(c_tree->children[1], x + length/2, y, length/2, shape);
-    draw_c_tree_as_image_aux(c_tree->children[2], x + length/2, y + length/2, length/2, shape);
-    draw_c_tree_as_image_aux(c_tree->children[3], x, y + length/2, length/2, shape);
+    draw_c_tree_as_image_aux(c_tree->children[0], x, y, length/2, shape, is_filled);
+    draw_c_tree_as_image_aux(c_tree->children[1], x + length/2, y, length/2, shape, is_filled);
+    draw_c_tree_as_image_aux(c_tree->children[2], x + length/2, y + length/2, length/2, shape, is_filled);
+    draw_c_tree_as_image_aux(c_tree->children[3], x, y + length/2, length/2, shape, is_filled);
   }
 }
 
-void draw_c_tree_as_image(c_node *c_tree, char shape) {
+void draw_c_tree_as_image(c_node *c_tree, char shape, bool is_filled) {
   MLV_draw_filled_rectangle(X_ORIGIN, Y_ORIGIN, IMAGE_SIZE, IMAGE_SIZE, MLV_COLOR_BLACK);
-  draw_c_tree_as_image_aux(c_tree, X_ORIGIN, Y_ORIGIN, IMAGE_SIZE, shape);
+  draw_c_tree_as_image_aux(c_tree, X_ORIGIN, Y_ORIGIN, IMAGE_SIZE, shape, is_filled);
   MLV_update_window();
 }
 
@@ -196,25 +262,25 @@ void split_leaves_by_err(c_node *c_tree, MLV_Image *image, int x, int y, int len
  * are below a certain reference error = (min_err + max_err) / 3
  * where min_err and max_err are the minimum and maximum errors of the leaves
  */
-float step_approximate(c_node *c_tree, MLV_Image *image, int delay, char shape) {
+float step_approximate(c_node *c_tree, MLV_Image *image, int delay, char shape, bool is_filled) {
   float min_err = FLT_MAX;
   float max_err = FLT_MIN;
   get_min_max_err(c_tree, image, 0, 0, MLV_get_image_width(image), &min_err, &max_err);
   float ref_err = (min_err + max_err) / 3;
   split_leaves_by_err(c_tree, image, 0, 0, MLV_get_image_width(image), ref_err);
-  draw_c_tree_as_image(c_tree, shape);
+  draw_c_tree_as_image(c_tree, shape, is_filled);
   MLV_wait_milliseconds(delay);
   return ref_err;
 }
 
-c_node *approximate_image(MLV_Image *image, char shape) {
+c_node *approximate_image(MLV_Image *image, char shape, bool is_filled) {
   color *c = average_color(image, 1, 1, MLV_get_image_width(image), MLV_get_image_height(image));
   c_node *c_tree = create_c_leaf(c);
   int delay = 10;
   float err = FLT_MAX;
   int step = 0;
   while(err > 0.00001) {
-    err = step_approximate(c_tree, image, delay, shape);
+    err = step_approximate(c_tree, image, delay, shape, is_filled);
     printf("Step %d, err %.2f\n", step, err);
     step++;
   }
@@ -239,21 +305,21 @@ bw_node *convert_c_tree_to_bw_tree(c_node *c_tree) {
   }
 }
 
-void draw_bw_tree_as_image_aux(bw_node *bw_tree, int x, int y, int length, char shape) {
+void draw_bw_tree_as_image_aux(bw_node *bw_tree, int x, int y, int length, char shape, bool is_filled) {
   if (bw_tree->children == NULL) {
     MLV_Color color = bw_tree->data == 0 ? MLV_COLOR_BLACK : MLV_COLOR_WHITE;
-    draw_shape(shape, color, x, y, length);
+    draw_shape(shape, is_filled, color, x, y, length);
   } else {
-    draw_bw_tree_as_image_aux(bw_tree->children[0], x, y, length/2, shape);
-    draw_bw_tree_as_image_aux(bw_tree->children[1], x + length/2, y, length/2, shape);
-    draw_bw_tree_as_image_aux(bw_tree->children[2], x + length/2, y + length/2, length/2, shape);
-    draw_bw_tree_as_image_aux(bw_tree->children[3], x, y + length/2, length/2, shape);
+    draw_bw_tree_as_image_aux(bw_tree->children[0], x, y, length/2, shape, is_filled);
+    draw_bw_tree_as_image_aux(bw_tree->children[1], x + length/2, y, length/2, shape, is_filled);
+    draw_bw_tree_as_image_aux(bw_tree->children[2], x + length/2, y + length/2, length/2, shape, is_filled);
+    draw_bw_tree_as_image_aux(bw_tree->children[3], x, y + length/2, length/2, shape, is_filled);
   }
 }
 
-void draw_bw_tree_as_image(bw_node *bw_tree, char shape) {
+void draw_bw_tree_as_image(bw_node *bw_tree, char shape, bool is_filled) {
   MLV_draw_filled_rectangle(X_ORIGIN, Y_ORIGIN, IMAGE_SIZE, IMAGE_SIZE, MLV_COLOR_BLACK);
-  draw_bw_tree_as_image_aux(bw_tree, X_ORIGIN, Y_ORIGIN, IMAGE_SIZE, shape);
+  draw_bw_tree_as_image_aux(bw_tree, X_ORIGIN, Y_ORIGIN, IMAGE_SIZE, shape, is_filled);
   MLV_update_window();
 }
 
@@ -282,6 +348,12 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
   char *filename = NULL;
   HashTable *hash_table = create_hash_table();
   create_folder("compressed");
+
+  bool is_filled = true;
+  char current_shape = 'r';
+  bool is_bw_tree = false;
+  bw_node *bw_tree = NULL;
+
   while (1) {
     MLV_wait_mouse(&x, &y);
 
@@ -289,28 +361,61 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
       CLEAR_NOTIFICATION();
       if (y >= BUTTON_Y_POS(0) && y <= BUTTON_Y_POS(0) + BUTTON_HEIGHT) {
         // Load Image
-        if (*image != NULL)
-          MLV_free_image(*image);
         filename = open_file_dialog("../imgs");
         if (filename != NULL) {
-          *image = MLV_load_image(filename);
-          if (*image != NULL) {
-            MLV_resize_image_with_proportions(*image, IMAGE_SIZE, IMAGE_SIZE);
-            MLV_draw_image(*image, X_ORIGIN, Y_ORIGIN);
+          if (ends_with(filename, ".qtc")) {
+            if (*tree != NULL) free_c_tree(*tree);
+            *tree = load_c_tree_binary(filename);
+            if (*tree != NULL) {
+              is_bw_tree = false;
+              draw_c_tree_as_image(*tree, current_shape, is_filled);
+              draw_text("Colored quadtree loaded", MLV_COLOR_YELLOW);
+            } else {
+              draw_text("Internal error", MLV_COLOR_RED);
+            }
+          } else if (ends_with(filename, ".qtn")) {
+            if (bw_tree != NULL) free_bw_tree(bw_tree);
+            bw_tree = load_bw_tree_binary(filename);
+            if (bw_tree != NULL) {
+              is_bw_tree = true;
+              draw_bw_tree_as_image(bw_tree, current_shape, is_filled);
+              draw_text("BW quadtree loaded", MLV_COLOR_YELLOW);
+            } else {
+              draw_text("Internal error", MLV_COLOR_RED);
+            }
           } else {
-            draw_text("Image not found", MLV_COLOR_RED);
+            if (*image != NULL) MLV_free_image(*image);
+            *image = MLV_load_image(filename);
+            if (*image != NULL) {
+              MLV_resize_image_with_proportions(*image, IMAGE_SIZE, IMAGE_SIZE);
+              MLV_draw_image(*image, X_ORIGIN, Y_ORIGIN);
+            } else {
+              draw_text("Image not found", MLV_COLOR_RED);
+            }
           }
           free(filename);
         }
       } else if (y >= BUTTON_Y_POS(1) && y <= BUTTON_Y_POS(1) + BUTTON_HEIGHT) {
-        // Quadtree Approximation
+        // Approximate Quadtree
         if (*image != NULL) {
-          *tree = approximate_image(*image, 'r');
+          if (*tree != NULL) free_c_tree(*tree);
+          *tree = approximate_image(*image, current_shape, is_filled);
+          is_bw_tree = false;
         }
       } else if (y >= BUTTON_Y_POS(2) && y <= BUTTON_Y_POS(2) + BUTTON_HEIGHT) {
-        // Save Binary BW
-        if (*tree != NULL) {
-          bw_node *bw_tree = convert_c_tree_to_bw_tree(*tree);
+        // Minimize Quadtree
+        if (is_bw_tree && bw_tree != NULL) {
+          // Cannot minimize BW tree directly without converting
+          draw_text("Cannot minimize BW tree", MLV_COLOR_RED);
+        } else if (!is_bw_tree && *tree != NULL) {
+          minimize_identical_leaves_in_node(*tree);
+          *tree = minimize_unique_leaves(*tree, hash_table);
+          draw_c_tree_as_image(*tree, current_shape, is_filled);
+          draw_text("Quadtree minimized", MLV_COLOR_YELLOW);
+        }
+      } else if (y >= BUTTON_Y_POS(3) && y <= BUTTON_Y_POS(3) + BUTTON_HEIGHT) {
+        // Save Image
+        if (is_bw_tree && bw_tree != NULL) {
           filename = save_file_dialog("../compressed");
           if (filename != NULL) {
             if(!ends_with(filename, ".qtn")) {
@@ -324,95 +429,59 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
             draw_text("Quadtree saved (BW)", MLV_COLOR_YELLOW);
             free(filename);
           }
-        }
-      } else if (y >= BUTTON_Y_POS(3) && y <= BUTTON_Y_POS(3) + BUTTON_HEIGHT) {
-        // Save Binary RGBA
-        if (*tree != NULL) {
+        } else if (!is_bw_tree && *tree != NULL) {
           filename = save_file_dialog("../compressed");
           if (filename != NULL) {
-            if(!ends_with(filename, ".qtc")) {
-              char* new_filename = malloc(strlen(filename) + 5);
-              strcpy(new_filename, filename);
-              strcat(new_filename, ".qtc");
-              free(filename);
-              filename = new_filename;
+            if (ends_with(filename, ".qtn")) {
+              bw_node* new_bw = convert_c_tree_to_bw_tree(*tree);
+              save_bw_tree_binary(filename, new_bw);
+              free_bw_tree(new_bw);
+              draw_text("Quadtree saved (BW)", MLV_COLOR_YELLOW);
+            } else {
+              if(!ends_with(filename, ".qtc")) {
+                char* new_filename = malloc(strlen(filename) + 5);
+                strcpy(new_filename, filename);
+                strcat(new_filename, ".qtc");
+                free(filename);
+                filename = new_filename;
+              }
+              save_c_tree_binary(filename, *tree);
+              draw_text("Quadtree saved (RGBA)", MLV_COLOR_YELLOW);
             }
-            save_c_tree_binary(filename, *tree);
-            draw_text("Quadtree saved (RGBA)", MLV_COLOR_YELLOW);
             free(filename);
           }
         }
       } else if (y >= BUTTON_Y_POS(4) && y <= BUTTON_Y_POS(4) + BUTTON_HEIGHT) {
-        // Minimize Quadtree
-        if (*tree != NULL) {
-          minimize_identical_leaves_in_node(*tree);
-          *tree = minimize_unique_leaves(*tree, hash_table);
-          draw_c_tree_as_image(*tree, '.');
-          draw_text("Quadtree minimized", MLV_COLOR_YELLOW);
+        // Toggle Mode
+        is_filled = !is_filled;
+        if (is_filled && current_shape == 'x') {
+            current_shape = 't'; // x shape is not supported in filled mode
+        }
+        draw_buttons(is_filled, current_shape);
+        if (is_bw_tree && bw_tree != NULL) {
+            draw_bw_tree_as_image(bw_tree, current_shape, is_filled);
+        } else if (!is_bw_tree && *tree != NULL) {
+            draw_c_tree_as_image(*tree, current_shape, is_filled);
         }
       } else if (y >= BUTTON_Y_POS(5) && y <= BUTTON_Y_POS(5) + BUTTON_HEIGHT) {
-        // Save Minimized BW
-        if (*tree != NULL) {
-          filename = save_file_dialog("../compressed");
-          if (filename != NULL) {
-            if(!ends_with(filename, ".qtn")) {
-              char* new_filename = malloc(strlen(filename) + 5);
-              strcpy(new_filename, filename);
-              strcat(new_filename, ".qtn");
-              free(filename);
-              filename = new_filename;
-            }
-            bw_node *bw_tree = convert_c_tree_to_bw_tree(*tree);
-            save_bw_tree_binary(filename, bw_tree);
-            draw_text("Quadtree saved (Minimized BW)", MLV_COLOR_YELLOW);
-            free(filename);
-          }
+        // Toggle Shape
+        char shapes_filled[] = {'t', 'c', 'r', 's', '*'};
+        char shapes_outline[] = {'t', 'c', 'r', 's', '*', 'x'};
+        char* shapes = is_filled ? shapes_filled : shapes_outline;
+        int num_shapes = is_filled ? 5 : 6;
+        int i;
+        for(i = 0; i < num_shapes; i++) {
+            if (shapes[i] == current_shape) break;
+        }
+        current_shape = shapes[(i + 1) % num_shapes];
+        draw_buttons(is_filled, current_shape);
+        if (is_bw_tree && bw_tree != NULL) {
+            draw_bw_tree_as_image(bw_tree, current_shape, is_filled);
+        } else if (!is_bw_tree && *tree != NULL) {
+            draw_c_tree_as_image(*tree, current_shape, is_filled);
         }
       } else if (y >= BUTTON_Y_POS(6) && y <= BUTTON_Y_POS(6) + BUTTON_HEIGHT) {
-        // Save Minimized RGBA
-        if (*tree != NULL) {
-          filename = save_file_dialog("../compressed");
-          if (filename != NULL) {
-            if(!ends_with(filename, ".qtc")) {
-              char* new_filename = malloc(strlen(filename) + 5);
-              strcpy(new_filename, filename);
-              strcat(new_filename, ".qtc");
-              free(filename);
-              filename = new_filename;
-            }
-            save_c_tree_binary(filename, *tree);
-            draw_text("Quadtree saved (Minimized RGBA)", MLV_COLOR_YELLOW);
-            free(filename);
-          }
-        }
-      } else if (y >= BUTTON_Y_POS(7) && y <= BUTTON_Y_POS(7) + BUTTON_HEIGHT) {
-        // Open Image
-        filename = open_file_dialog("../compressed");
-        if (filename != NULL) {
-          if(ends_with(filename, ".qtc")) {
-            *tree = load_c_tree_binary(filename);
-            if (*tree != NULL) {
-              draw_c_tree_as_image(*tree, '.');
-              draw_text("Minimizd colored quadtree loaded", MLV_COLOR_YELLOW);
-            } else {
-              draw_text("Internal error", MLV_COLOR_RED);
-            }
-          }
-          else if(ends_with(filename, ".qtn")) {
-            bw_node *bw_tree = load_bw_tree_binary(filename);
-            if (bw_tree != NULL) {
-              draw_bw_tree_as_image(bw_tree, '.');
-              draw_text("Minimizd BW quadtree loaded", MLV_COLOR_YELLOW);
-            } else {
-              draw_text("Internal error", MLV_COLOR_RED);
-            }
-          } else {
-            draw_text("Wrong format", MLV_COLOR_RED);
-          }
-          free(filename);
-        }
-      } else if (y >= BUTTON_Y_POS(8) && y <= BUTTON_Y_POS(8) + BUTTON_HEIGHT) {
-        // Quit
+        // Quit Application
         break;
       }
       MLV_update_window();

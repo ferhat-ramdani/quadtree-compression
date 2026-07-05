@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     fflush(stdout);
 
     initialize_window();
-    draw_buttons();
+    draw_buttons(true, 'r');
     MLV_update_window();
 
     handle_buttons(&image, &tree);
