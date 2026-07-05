@@ -7,6 +7,7 @@
 #include "color.h"
 #include "binary_converter.h"
 #include "minimizer.h"
+#include "utils.h"
 #include <string.h>
 
 #include <dirent.h>
@@ -290,13 +291,16 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
         // Load Image
         if (*image != NULL)
           MLV_free_image(*image);
-        DRAW_INPUT_BOX(0, "Enter image filename: ", &filename);
-        *image = MLV_load_image(filename);
-        if (*image != NULL) {
-          MLV_resize_image_with_proportions(*image, IMAGE_SIZE, IMAGE_SIZE);
-          MLV_draw_image(*image, X_ORIGIN, Y_ORIGIN);
-        } else {
-          draw_text("Image not found", MLV_COLOR_RED);
+        filename = open_file_dialog("../imgs");
+        if (filename != NULL) {
+          *image = MLV_load_image(filename);
+          if (*image != NULL) {
+            MLV_resize_image_with_proportions(*image, IMAGE_SIZE, IMAGE_SIZE);
+            MLV_draw_image(*image, X_ORIGIN, Y_ORIGIN);
+          } else {
+            draw_text("Image not found", MLV_COLOR_RED);
+          }
+          free(filename);
         }
       } else if (y >= BUTTON_Y_POS(1) && y <= BUTTON_Y_POS(1) + BUTTON_HEIGHT) {
         // Quadtree Approximation
@@ -307,27 +311,36 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
         // Save Binary BW
         if (*tree != NULL) {
           bw_node *bw_tree = convert_c_tree_to_bw_tree(*tree);
-          DRAW_INPUT_BOX(2, "Enter filename to save (BW): ", &filename);
-          if(!ends_with(filename, ".qtn")) {
-            strcat(filename, ".qtn");
+          filename = save_file_dialog("../compressed");
+          if (filename != NULL) {
+            if(!ends_with(filename, ".qtn")) {
+              char* new_filename = malloc(strlen(filename) + 5);
+              strcpy(new_filename, filename);
+              strcat(new_filename, ".qtn");
+              free(filename);
+              filename = new_filename;
+            }
+            save_bw_tree_binary(filename, bw_tree);
+            draw_text("Quadtree saved (BW)", MLV_COLOR_YELLOW);
+            free(filename);
           }
-          char filepath[256];
-          
-          sprintf(filepath, "compressed/%s", filename);
-          save_bw_tree_binary(filepath, bw_tree);
-          draw_text("Quadtree saved (BW)", MLV_COLOR_YELLOW);
         }
       } else if (y >= BUTTON_Y_POS(3) && y <= BUTTON_Y_POS(3) + BUTTON_HEIGHT) {
         // Save Binary RGBA
         if (*tree != NULL) {
-          DRAW_INPUT_BOX(3, "Enter filename to save (RGBA): ", &filename);
-          if(!ends_with(filename, ".qtc")) {
-            strcat(filename, ".qtc");
+          filename = save_file_dialog("../compressed");
+          if (filename != NULL) {
+            if(!ends_with(filename, ".qtc")) {
+              char* new_filename = malloc(strlen(filename) + 5);
+              strcpy(new_filename, filename);
+              strcat(new_filename, ".qtc");
+              free(filename);
+              filename = new_filename;
+            }
+            save_c_tree_binary(filename, *tree);
+            draw_text("Quadtree saved (RGBA)", MLV_COLOR_YELLOW);
+            free(filename);
           }
-          char filepath[256];
-          sprintf(filepath, "compressed/%s", filename);
-          save_c_tree_binary(filepath, *tree);
-          draw_text("Quadtree saved (RGBA)", MLV_COLOR_YELLOW);
         }
       } else if (y >= BUTTON_Y_POS(4) && y <= BUTTON_Y_POS(4) + BUTTON_HEIGHT) {
         // Minimize Quadtree
@@ -340,46 +353,63 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
       } else if (y >= BUTTON_Y_POS(5) && y <= BUTTON_Y_POS(5) + BUTTON_HEIGHT) {
         // Save Minimized BW
         if (*tree != NULL) {
-          DRAW_INPUT_BOX(5, "Enter filename to save (Minimized BW): ", &filename);
-          if(!ends_with(filename, ".qtn")) {
-            strcat(filename, ".qtn");
+          filename = save_file_dialog("../compressed");
+          if (filename != NULL) {
+            if(!ends_with(filename, ".qtn")) {
+              char* new_filename = malloc(strlen(filename) + 5);
+              strcpy(new_filename, filename);
+              strcat(new_filename, ".qtn");
+              free(filename);
+              filename = new_filename;
+            }
+            bw_node *bw_tree = convert_c_tree_to_bw_tree(*tree);
+            save_bw_tree_binary(filename, bw_tree);
+            draw_text("Quadtree saved (Minimized BW)", MLV_COLOR_YELLOW);
+            free(filename);
           }
-          bw_node *bw_tree = convert_c_tree_to_bw_tree(*tree);
-          save_bw_tree_binary(filename, bw_tree);
-          draw_text("Quadtree saved (Minimized BW)", MLV_COLOR_YELLOW);
         }
       } else if (y >= BUTTON_Y_POS(6) && y <= BUTTON_Y_POS(6) + BUTTON_HEIGHT) {
         // Save Minimized RGBA
         if (*tree != NULL) {
-          DRAW_INPUT_BOX(6, "Enter filename to save (Minimized RGBA): ", &filename);
-          if(!ends_with(filename, ".qtc")) {
-            strcat(filename, ".qtc");
+          filename = save_file_dialog("../compressed");
+          if (filename != NULL) {
+            if(!ends_with(filename, ".qtc")) {
+              char* new_filename = malloc(strlen(filename) + 5);
+              strcpy(new_filename, filename);
+              strcat(new_filename, ".qtc");
+              free(filename);
+              filename = new_filename;
+            }
+            save_c_tree_binary(filename, *tree);
+            draw_text("Quadtree saved (Minimized RGBA)", MLV_COLOR_YELLOW);
+            free(filename);
           }
-          save_c_tree_binary(filename, *tree);
-          draw_text("Quadtree saved (Minimized RGBA)", MLV_COLOR_YELLOW);
         }
       } else if (y >= BUTTON_Y_POS(7) && y <= BUTTON_Y_POS(7) + BUTTON_HEIGHT) {
         // Open Image
-        DRAW_INPUT_BOX(7, "Enter filename to open: ", &filename);
-        if(ends_with(filename, ".qtc")) {
-          *tree = load_c_tree_binary(filename);
-          if (*tree != NULL) {
-            draw_c_tree_as_image(*tree, '.');
-            draw_text("Minimizd colored quadtree loaded", MLV_COLOR_YELLOW);
-          } else {
-            draw_text("Internal error", MLV_COLOR_RED);
+        filename = open_file_dialog("../compressed");
+        if (filename != NULL) {
+          if(ends_with(filename, ".qtc")) {
+            *tree = load_c_tree_binary(filename);
+            if (*tree != NULL) {
+              draw_c_tree_as_image(*tree, '.');
+              draw_text("Minimizd colored quadtree loaded", MLV_COLOR_YELLOW);
+            } else {
+              draw_text("Internal error", MLV_COLOR_RED);
+            }
           }
-        }
-        else if(ends_with(filename, ".qtn")) {
-          bw_node *bw_tree = load_bw_tree_binary(filename);
-          if (bw_tree != NULL) {
-            draw_bw_tree_as_image(bw_tree, '.');
-            draw_text("Minimizd BW quadtree loaded", MLV_COLOR_YELLOW);
+          else if(ends_with(filename, ".qtn")) {
+            bw_node *bw_tree = load_bw_tree_binary(filename);
+            if (bw_tree != NULL) {
+              draw_bw_tree_as_image(bw_tree, '.');
+              draw_text("Minimizd BW quadtree loaded", MLV_COLOR_YELLOW);
+            } else {
+              draw_text("Internal error", MLV_COLOR_RED);
+            }
           } else {
-            draw_text("Internal error", MLV_COLOR_RED);
+            draw_text("Wrong format", MLV_COLOR_RED);
           }
-        } else {
-          draw_text("Wrong format", MLV_COLOR_RED);
+          free(filename);
         }
       } else if (y >= BUTTON_Y_POS(8) && y <= BUTTON_Y_POS(8) + BUTTON_HEIGHT) {
         // Quit
