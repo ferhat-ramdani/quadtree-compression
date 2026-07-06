@@ -133,7 +133,6 @@ gantt
     QTC (240kb)     : 0, 240967
     QTN (67kb)      : 0, 67471
 ```
-*(Note: Gantt chart format is used creatively above to represent bar lengths for relative size comparison)*
 
 ### Academic Conclusion
 The quadtree algorithm demonstrates **excellent compression ratios for flat, geometric, or solid-color graphics** (such as `chess.png` and `monochrome.jpg`), effectively outperforming or rivaling modern lossless formats by grouping large identical pixel blocks into single nodes.
