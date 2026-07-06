@@ -14,15 +14,21 @@ void minimize_identical_leaves_in_node(c_node *node) {
   }
 
   bool identical_leaves_in_node = true;
+  if (node->children[0]->children != NULL) {
+    identical_leaves_in_node = false;
+  } else {
     color *first_color = node->children[0]->color;
     for (int i = 1; i < MAX_CHILDREN; i++) {
-    if (node->children[i]->children != NULL || c_equals(node->children[i]->color, first_color)) {
-      identical_leaves_in_node = false;
-      break;
+      if (node->children[i]->children != NULL || !c_equals(node->children[i]->color, first_color)) {
+        identical_leaves_in_node = false;
+        break;
+      }
     }
   }
 
   if (identical_leaves_in_node) {
+    color *first_color = node->children[0]->color;
+    node->children[0]->color = NULL; // prevent free
     for (int i = 0; i < MAX_CHILDREN; i++) {
       free_c_tree(node->children[i]);
     }

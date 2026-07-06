@@ -83,15 +83,44 @@ void free_c_leaf(c_node *leaf) {
   free(leaf);
 }
 
+void collect_c_tree_nodes(c_node *t, c_node ***nodes, int *count, int *capacity) {
+  if (t == NULL) return;
+  if (*count >= *capacity) {
+    *capacity *= 2;
+    *nodes = realloc(*nodes, *capacity * sizeof(c_node*));
+  }
+  (*nodes)[(*count)++] = t;
+  
+  if (t->children != NULL) {
+    for (int i = 0; i < MAX_CHILDREN; i++) {
+      collect_c_tree_nodes(t->children[i], nodes, count, capacity);
+    }
+  }
+}
+
+int compare_pointers(const void *a, const void *b) {
+  c_node *pa = *(c_node**)a;
+  c_node *pb = *(c_node**)b;
+  if (pa < pb) return -1;
+  if (pa > pb) return 1;
+  return 0;
+}
+
 void free_c_tree(c_node *t) {
   if (t == NULL) return;
-  if (t->children == NULL)
-    free_c_leaf(t);
-  else {
-    for (int i = 0; i < MAX_CHILDREN; i++)
-      free_c_tree(t->children[i]);
-    free(t->color);
-    free(t->children);
-    free(t);
+  int capacity = 1024;
+  int count = 0;
+  c_node **nodes = malloc(capacity * sizeof(c_node*));
+  collect_c_tree_nodes(t, &nodes, &count, &capacity);
+  
+  qsort(nodes, count, sizeof(c_node*), compare_pointers);
+  
+  for (int i = 0; i < count; i++) {
+    if (i > 0 && nodes[i] == nodes[i-1]) continue;
+    c_node *node = nodes[i];
+    if (node->color) free(node->color);
+    if (node->children) free(node->children);
+    free(node);
   }
+  free(nodes);
 }

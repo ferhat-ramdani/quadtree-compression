@@ -399,15 +399,27 @@ void handle_buttons(MLV_Image **image, c_node **tree) {
         // Approximate Quadtree
         if (*image != NULL) {
           if (*tree != NULL) free_c_tree(*tree);
+          free_hash_table(hash_table);
+          hash_table = create_hash_table();
           *tree = approximate_image(*image, current_shape, is_filled);
           is_bw_tree = false;
         }
       } else if (y >= BUTTON_Y_POS(2) && y <= BUTTON_Y_POS(2) + BUTTON_HEIGHT) {
         // Minimize Quadtree
-        if (is_bw_tree && bw_tree != NULL) {
-          // Cannot minimize BW tree directly without converting
+        if (*image != NULL) {
+          if (*tree != NULL) free_c_tree(*tree);
+          free_hash_table(hash_table);
+          hash_table = create_hash_table();
+          *tree = approximate_image(*image, current_shape, is_filled);
+          minimize_identical_leaves_in_node(*tree);
+          *tree = minimize_unique_leaves(*tree, hash_table);
+          is_bw_tree = false;
+          draw_c_tree_as_image(*tree, current_shape, is_filled);
+          draw_text("Quadtree minimized", MLV_COLOR_YELLOW);
+        } else if (is_bw_tree && bw_tree != NULL) {
           draw_text("Cannot minimize BW tree", MLV_COLOR_RED);
         } else if (!is_bw_tree && *tree != NULL) {
+          // Fallback if we only have a loaded tree and no original image
           minimize_identical_leaves_in_node(*tree);
           *tree = minimize_unique_leaves(*tree, hash_table);
           draw_c_tree_as_image(*tree, current_shape, is_filled);
