@@ -18,6 +18,8 @@ src/stderr.txt
 src/dlls/stdout.txt
 src/dlls/stderr.txt
 src/output.log
+src/out.log
+src/out.txt
 
 # MLV downloaded/extracted files
 src/mlv_extracted/
