@@ -8,8 +8,11 @@ It allows you to:
 - Minimize the generated quadtree by merging identical branches.
 - Save and load the compressed quadtrees in custom binary formats (`.qtn` for Black & White, `.qtc` for RGBA).
 
-Lien vers le repository du projet :
-https://github.com/ghassenhnid/Image-Compression-with-Quadtrees
+<p align="center">
+   <img width="800" height="540" alt="quadtree_compression" src="https://github.com/user-attachments/assets/3fb841b8-26dd-43ca-a846-69662134d239" />
+   <br>
+   <sub>Demo of the Quadtree Compression app.</sub>
+</p>
 
 ## Requirements
 To compile and run this project, you need:
