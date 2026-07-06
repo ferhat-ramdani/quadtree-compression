@@ -20,6 +20,11 @@ src/dlls/stderr.txt
 src/output.log
 src/out.log
 src/out.txt
+src/benchmark_results.txt
+src/stdout.log
+src/stderr.log
+src/dlls/stdout.log
+src/dlls/stderr.log
 
 # MLV downloaded/extracted files
 src/mlv_extracted/
