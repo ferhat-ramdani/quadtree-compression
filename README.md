@@ -1,7 +1,7 @@
 # Image Compression with Quadtrees
 
 ## Description
-This project implements an image compression algorithm using **Quadtrees**. A quadtree is a tree data structure where each internal node has exactly four children. In this context, it recursively subdivides an image into four quadrants to approximate regions of similar colors, thereby compressing the image. The project features a graphical user interface (GUI) built with the [MLV library](http://www-igm.univ-mlv.fr/~boussica/mlv/index.html).
+An image compressor that represents pictures as **quadtrees** instead of pixel grids: recursively subdivide the image into four quadrants wherever a region isn't uniform enough, stop subdividing once a flat color is a good-enough approximation. The interesting part wasn't getting it to compress — it was finding out, with real numbers, exactly where this approach wins (flat vector art, geometric graphics) and where it loses badly (photographs, noisy textures), which the benchmarks at the bottom of this README lay out honestly. The project features a graphical user interface (GUI) built with the [MLV library](http://www-igm.univ-mlv.fr/~boussica/mlv/index.html).
 
 It allows you to:
 - Load an image and perform a quadtree approximation.
@@ -9,7 +9,7 @@ It allows you to:
 - Save and load the compressed quadtrees in custom binary formats (`.qtn` for Black & White, `.qtc` for RGBA).
 
 <p align="center">
-   <img width="800" height="540" alt="quadtree_compression" src="https://github.com/user-attachments/assets/3fb841b8-26dd-43ca-a846-69662134d239" />
+   <img width="800" alt="quadtree_compression" src="https://github.com/user-attachments/assets/3fb841b8-26dd-43ca-a846-69662134d239" />
    <br>
    <sub>Demo of the Quadtree Compression app.</sub>
 </p>
