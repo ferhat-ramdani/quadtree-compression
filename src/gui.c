@@ -268,7 +268,11 @@ void create_folder(char *filename){
   if (dir){
     closedir(dir);
   }else if(ENOENT == errno){
+#ifdef _WIN32
+    mkdir(filename);
+#else
     mkdir(filename, 0755);
+#endif
   }
 }
 

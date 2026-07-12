@@ -6,9 +6,14 @@
 #include "gui.h"
 #include "binary_converter.h"
 
-int main() {
+int main(int argc, char *argv[]) {
+    (void)argc;
+    (void)argv;
     MLV_Image *image = NULL;
     c_node *tree = NULL;
+    
+    printf("Starting program...\n");
+    fflush(stdout);
 
     initialize_window();
     draw_buttons();

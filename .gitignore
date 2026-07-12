@@ -1,3 +1,34 @@
+# Object files
 *.o
-main
-compressed/*
+*.obj
+
+# Executables and Libraries
+*.exe
+*.dll
+
+# Build directories
+src/bin/
+
+# Temporary / Output files
+*.qtn
+*.qtc
+src/compressed/
+src/stdout.txt
+src/stderr.txt
+src/dlls/stdout.txt
+src/dlls/stderr.txt
+src/output.log
+
+# MLV downloaded/extracted files
+src/mlv_extracted/
+*.zip
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
+
+# VS Code / IDE
+.vscode/
+.vs/
+*.swp
+*~

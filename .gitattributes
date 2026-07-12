@@ -1,0 +1,20 @@
+# Set default behavior, in case people don't have core.autocrlf set.
+# This will force Git to normalize line endings to LF on commit.
+* text=auto
+
+# Explicitly declare text files you want to always be normalized
+*.c text
+*.h text
+*.md text
+makefile text
+
+# Ensure Windows batch files always retain CRLF line endings so they run correctly
+*.bat text eol=crlf
+
+# Denote all files that are truly binary and should not be modified by Git
+*.exe binary
+*.dll binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.ttf binary
